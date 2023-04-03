@@ -7,7 +7,7 @@ if __name__ == '__main__':
     from config import DATABASEPASSWORD, DATABASENAME, HOST, USER
 else:
     from boredapp.config import DATABASEPASSWORD, DATABASENAME, USER, HOST
-from sqlalchemy import create_engine, orm
+from sqlalchemy import create_engine, orm, Index
 
 Base = sqlalchemy.orm.declarative_base()
 
@@ -42,10 +42,10 @@ class TheUsers(Base):
     UserID = database.Column(database.Integer, primary_key=True, autoincrement=True, nullable=False)
     FirstName = database.Column(database.String(65), nullable=False)
     LastName = database.Column(database.String(65), nullable=False)
-    Email = database.Column(database.String(65), nullable=False, unique=True)
+    Email = database.Column(database.String(65), nullable=False, unique=True, index=True)  # create index for Email column
     DOB = database.Column(database.DateTime, nullable=False)
     City = database.Column(database.String(200), nullable=False)
-    Username = database.Column(database.String(200), nullable=False)
+    Username = database.Column(database.String(200), nullable=False, index=True)  # create index for Username column
     Password = database.Column(database.String(200), nullable=False)
 
     def __init__(self, FirstName, LastName, Email, DOB, City, Username, Password):
@@ -75,6 +75,11 @@ class Favourites(Base):
         self.participants = participants
         self.price = price
         self.type = type
+
+        # create 2 column index for activity id and user id.
+        __table_args__ = (
+            Index('ix_favourites_activityID_UserID', 'activityID', 'UserID'),
+        )
 
 
 engine = create_engine("mysql+mysqlconnector://{user}:{password}@{host}/{DatabaseName}".format(
