@@ -5,6 +5,7 @@
 
 <i>The BoredApp assists users in generating a chosen activity to take part in based on the users budget,number of participants, activities with links , a specific type of activity or choose an activity at random.
            
+I've used SQL Indexes in my Database to speed up database queries and make data retrieval more efficient.
 
 ✨<b>How to Run:</b>
 
@@ -17,5 +18,10 @@
 * Run `python run.py` in the terminal of the root directory of the project or run the 'run.py' file directly and then click the link: http://127.0.0.1:5000.
 
 
-I've used SQL Indexes in my Database to speed up database queries and make data retrieval more efficient.
 
+
+
+
+✨<b>How to Test:</b>
+
+* Run `test run.py` in the terminal of the root directory of the project or run the 'test.py' file directly.
