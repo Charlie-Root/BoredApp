@@ -10,7 +10,7 @@
 
 * Install the dependencies by running `pip install -r requirements.txt` in the terminal or command prompt on your system.
 
-* Run the 'models.py' file to create your database and it's tables.
+* Run the 'models.py' file once to create your database and it's tables.
 
 * set up your environmental variables in a '.env' file in the root. With variables for USER = "[your MYSQL user]", DATABASEPASSWORD = "[your MYSQL password]" ,HOST = "[your MYSQL host]" and SECRET_KEY = "[your secret key]"
 
