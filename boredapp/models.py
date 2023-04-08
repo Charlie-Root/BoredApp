@@ -14,6 +14,9 @@ Base = sqlalchemy.orm.declarative_base()
 # TO CREATE THE DATABASE
 # Note: I put this in a function to prevent cnx from running when i run the app even when i haven't ran the models file.
 def create_database():
+    """
+    This function creates a new MYSQL database.
+    """
     # Establish a connection to the MySQL server
     cnx = mysql.connector.connect(user=USER, password=DATABASEPASSWORD, host=HOST)
 
@@ -37,6 +40,9 @@ Base = sqlalchemy.orm.declarative_base()
 
 
 class TheUsers(Base):
+    """
+        This function creates a new MYSQL database table.
+    """
     __tablename__ = 'the_users'
 
     UserID = database.Column(database.Integer, primary_key=True, autoincrement=True, nullable=False)
@@ -59,6 +65,9 @@ class TheUsers(Base):
 
 
 class Favourites(Base):
+    """
+        This function creates a new MYSQL database table.
+    """
     __tablename__ = 'favourites'
 
     activityID = database.Column(database.Integer, primary_key=True, nullable=False)

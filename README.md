@@ -25,3 +25,5 @@ I've used SQL Indexes in my Database to speed up database queries and make data 
 ✨<b>How to Test:</b>
 
 * Run `test run.py` in the terminal of the root directory of the project or run the 'test.py' file directly.
+
+* Code Structure reference: https://youtu.be/44PvX0Yv368

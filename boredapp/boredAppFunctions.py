@@ -12,8 +12,7 @@ APIurl = "http://www.boredapi.com/api/activity"
 
 def display_the_activity(activityID):
     """
-        Display activity info, we can use if else statements to format the string in certain ways depending on what the activity selection was based on
-
+        This function displays an activities' info.
     """
 
     url = "{}?key={}".format(APIurl, activityID)
@@ -37,6 +36,9 @@ def display_the_activity(activityID):
 
 
 def check_if_activity_is_in_favourites(activityID, UserID):
+    """
+        This function checks the database to see if the activity that the user wants to save is already saved in the database or not.
+    """
     favouritesExists = database.session.query(Favourites).filter_by(activityID=activityID, UserID=UserID).first()
 
     if favouritesExists:  # if True
@@ -45,9 +47,11 @@ def check_if_activity_is_in_favourites(activityID, UserID):
         return False
 
 
-# this must be called after a user has logged in, so we can save the user's UserID into the session for later use
+# this must be called after a user has logged in, so we can save the user's UserID into the session for later use.
 def get_user_id():
-    # query user id where email/username is
+    """
+        This function checks if an 'email' or 'username' is in the current session and uses this data to search for the users ID number from the database.
+    """
     if 'Email' in session:
         # query the user by their email
         current_user = database.session.query(TheUsers).filter_by(Email="{}".format(session['Email'])).first()
@@ -62,7 +66,9 @@ def get_user_id():
 
 
 def get_user_firstname():
-    # query user firstname where email/username is
+    """
+        This function checks if an 'email' or 'username' is in the current session and uses this data to search for the users Firstname from the database.
+    """
     if 'Email' in session:
         # query the user by their email
         current_user = database.session.query(TheUsers).filter_by(Email="{}".format(session['Email'])).first()
@@ -76,6 +82,9 @@ def get_user_firstname():
     return FirstName.capitalize()
 
 def is_user_logged_in():
+    """
+        This function checks if there is a UserID saved in the current session to verify if a user is currently logged in or not.
+    """
     if "UserID" in session:  # if the user has logged in
         return True
     else:

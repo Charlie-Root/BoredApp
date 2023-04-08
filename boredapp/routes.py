@@ -7,14 +7,15 @@ import re
 from boredapp.models import TheUsers, Favourites
 from boredapp.forms import SignUpForm, LogInForm, ForgotPassword
 
-
-
 APIurl = "http://www.boredapi.com/api/activity"
 
 
 # FLASK APP SERVER FUNCTIONS
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
+    """
+        This function allows a user to sign up and check the database to see if they are already signed up or not + also checks if a user is already logged in.
+    """
     if is_user_logged_in() is True:
         return redirect(url_for("user"))
     else:
@@ -45,15 +46,16 @@ def signup():
 
                 # Check if there's a user in the database with this username/email already
                 # this returns the user row with this email/username or None if it doesn't exist
-                user_exists = database.session.query(TheUsers).filter((TheUsers.Email == email) | (TheUsers.Username == username)).first()
+                user_exists = database.session.query(TheUsers).filter(
+                    (TheUsers.Email == email) | (TheUsers.Username == username)).first()
 
                 if user_exists:
                     flash("A User already exists with this email/username.", "error")
                 else:
                     # save user into database
                     new_user = TheUsers(FirstName=firstname, LastName=lastname, Email=email, DOB=dateofbirth,
-                                         City=city,
-                                         Username=username, Password=password)  # hash password
+                                        City=city,
+                                        Username=username, Password=password)  # hash password
                     database.session.add(new_user)
                     database.session.commit()
 
@@ -68,6 +70,9 @@ def signup():
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
+    """
+        This function allows a user to log in and check the database to see if their log in credentials are correct + also checks if a user is already logged in.
+    """
     if is_user_logged_in() is False:
         emailOrUsername = password = None
         form = LogInForm()
@@ -112,6 +117,9 @@ def login():
 
 @app.route("/forgotpassword", methods=["POST", "GET"])
 def forgotpassword():
+    """
+        This function allows a user to reset their password via an external link using their email or username.
+    """
     emailOrUsername = None
     form = ForgotPassword()
 
@@ -131,11 +139,17 @@ def forgotpassword():
 
 @app.route("/")
 def home():
+    """
+        This function displays the homepage.
+    """
     return render_template("home.html")
 
 
 @app.route("/favourites")
 def view_favourites():
+    """
+        This function displays a user's favourite activities page if they are logged in or takes them to the login page if they are not.
+    """
     if is_user_logged_in() is True:
         users_favourites = (
             database.session.query(Favourites.activity, Favourites.participants, Favourites.type, Favourites.price)
@@ -148,6 +162,9 @@ def view_favourites():
 
 @app.route("/activity")  # < > lets you pass value through to function as a parameter
 def activity():
+    """
+        This function displays a user's activity page if they are logged in or takes them to the login page if they are not.
+    """
     if is_user_logged_in() is True:
         return render_template("activityPage.html")
     else:
@@ -156,15 +173,20 @@ def activity():
 
 @app.route("/user", methods=["POST", "GET"])
 def user():
+    """
+        This function displays a user's user page if they are logged in or takes them to the login page if they are not.
+    """
     if is_user_logged_in() is True:
         return render_template("user.html")
     else:
         return redirect(url_for("login"))
 
 
-
 @app.route("/logout")
 def logout():
+    """
+        This function removes the user's data from the current session to log them out and redirects the user to the home page of the app.
+    """
     if "Username" or "Email" in session:  # if the user has logged in
         flash("Logged out successfully", "success")
 
@@ -179,6 +201,9 @@ def logout():
 
 @app.route("/randomActivity", methods=["GET", "POST"])
 def randomActivity():
+    """
+        This function generates a random activity from the api.
+    """
     if is_user_logged_in() is True:
         if request.method == 'POST':
             clicked = True
@@ -197,6 +222,9 @@ def randomActivity():
 
 @app.route("/participantNumber", methods=["GET", "POST"])
 def participantNumber():
+    """
+        This function generates an activity from the api based on an inputted number of participants.
+    """
     if is_user_logged_in() is True:
 
         if request.method == 'POST':
@@ -207,7 +235,8 @@ def participantNumber():
             # Invalid Input Handling for user input
             regex_requirements = re.compile(r"^[1-5]|8$")
 
-            participant_no_valid = regex_requirements.fullmatch(number_of_participants)  # returns ['0' if True or None is False]
+            participant_no_valid = regex_requirements.fullmatch(
+                number_of_participants)  # returns ['0' if True or None is False]
 
             if participant_no_valid:
                 url = "{}?participants={}".format(APIurl, number_of_participants)
@@ -229,6 +258,9 @@ def participantNumber():
 
 @app.route("/budgetRange", methods=["GET", "POST"])
 def budgetRange():
+    """
+        This function generates an activity from the api based on an inputted budget range.
+    """
     if is_user_logged_in() is True:
         if request.method == 'POST':
             form = request.form  # get the html form
@@ -262,6 +294,9 @@ def budgetRange():
 
 @app.route("/activityType", methods=["GET", "POST"])
 def activityType():
+    """
+        This function generates an activity from the api based on an inputted activity type.
+    """
     if is_user_logged_in() is True:
         if request.method == 'POST':
             form = request.form  # get the html form
@@ -270,13 +305,15 @@ def activityType():
 
             # Invalid Input Handling for user input
             # It is made not case-sensitive
-            regex_requirements = re.compile(r"\b(education|recreational|social|diy|charity|cooking|relaxation|music|busywork)\b", re.IGNORECASE)
+            regex_requirements = re.compile(
+                r"\b(education|recreational|social|diy|charity|cooking|relaxation|music|busywork)\b", re.IGNORECASE)
 
             activity_type_valid = regex_requirements.fullmatch(
                 activityType)  # returns ['0' if True or None is False]
 
             if activity_type_valid:
-                url = "{}?type={}".format(APIurl, activityType.lower())  # .lower(): we make it all lowercase here to ensure we can correctly access the api key without errors since the user input it not case sensitive
+                url = "{}?type={}".format(APIurl,
+                                          activityType.lower())  # .lower(): we make it all lowercase here to ensure we can correctly access the api key without errors since the user input it not case sensitive
                 activity = connect_to_api(url)
 
                 activityID = activity['key']
@@ -295,6 +332,9 @@ def activityType():
 
 @app.route("/activityLinked", methods=["GET", "POST"])
 def activityLinked():
+    """
+        This function generates an activity from the api that has a link attached to it.
+    """
     if is_user_logged_in() is True:
         if request.method == 'POST':
 
@@ -317,6 +357,9 @@ def activityLinked():
 # B Try use js for this, like an on click function instead of needing a route
 @app.route("/saveActivity", methods=["GET", "POST"])
 def saveActivity():
+    """
+        This function saves an activity into the database and also checks if the activity is already in the database or not.
+    """
     if is_user_logged_in() is True:
         activityID = session['activityID']
         UserID = session['UserID']
