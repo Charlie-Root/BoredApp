@@ -137,3 +137,6 @@ class TestGetUserID(unittest.TestCase):
 
 
 """Test display the activity"""
+
+if __name__ == "__main__":
+    unittest.main()
