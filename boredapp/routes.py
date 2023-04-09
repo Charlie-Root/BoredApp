@@ -354,7 +354,6 @@ def activityLinked():
         return redirect(url_for("login"))
 
 
-# B Try use js for this, like an on click function instead of needing a route
 @app.route("/saveActivity", methods=["GET", "POST"])
 def saveActivity():
     """

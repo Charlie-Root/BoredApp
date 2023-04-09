@@ -5,15 +5,19 @@ from boredapp.models import TheUsers, Favourites
 
 APIurl = "http://www.boredapi.com/api/activity"
 
+
 # note: Since we've created an index for the 'email' column, 'username' column and a double column index for the 'activityID' and 'UserID' Column,
-    # MySQL will automatically use the indexes to optimize our following queries. We don't need to specify the index
-    # in the query since SQLAlchemy will handle it for us.
-    # Using the indexes will speed up the search.
+# MySQL will automatically use the indexes to optimize our following queries. We don't need to specify the index
+# in the query since SQLAlchemy will handle it for us.
+# Using the indexes will speed up the search.
 
 def display_the_activity(activityID):
     """
         This function displays an activities' info.
     """
+
+    if activityID is None:
+        return "No activity has been selected"
 
     url = "{}?key={}".format(APIurl, activityID)
     activity = connect_to_api(url)
@@ -60,6 +64,9 @@ def get_user_id():
         # query the user by their username
         current_user = database.session.query(TheUsers).filter_by(Username="{}".format(session['Username'])).first()
 
+    else:
+        return "User is not logged in"
+
     UserID = current_user.UserID  # select their UserID column
 
     return UserID
@@ -77,9 +84,13 @@ def get_user_firstname():
         # query the user by their username
         current_user = database.session.query(TheUsers).filter_by(Username="{}".format(session['Username'])).first()
 
+    else:
+        return "User is not logged in"
+
     FirstName = current_user.FirstName  # select their FirstName column
 
     return FirstName.capitalize()
+
 
 def is_user_logged_in():
     """
