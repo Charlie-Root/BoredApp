@@ -2,7 +2,7 @@ import json
 
 import requests
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy#
+from flask_sqlalchemy import SQLAlchemy
 from boredapp.config import DATABASEPASSWORD, DATABASENAME, SECRET_KEY
 
 """
