@@ -146,19 +146,41 @@ def home():
 
 
 @app.route("/favourites")
-def view_favourites():
+def view_all_favourites():
     """
         This function displays a user's favourite activities page if they are logged in or takes them to the login page if they are not.
     """
     if is_user_logged_in() is True:
-        users_favourites = (
+        all_users_favourites = (
             database.session.query(Favourites.activity, Favourites.participants, Favourites.type, Favourites.price,
                                    Favourites.activityID)
             .filter(Favourites.UserID == session["UserID"])
             .all())
-        return render_template("favourites.html", users_favourites=users_favourites)
+        return render_template("favourites.html", users_favourites=all_users_favourites)
     else:
         return redirect(url_for("login"))
+
+@app.route('/favourites/',methods=['GET', 'POST'])
+def view_favourites_by_activity_type():
+    """
+        This function displays a user's favourite activities page if they are logged in or takes them to the login page if they are not.
+    """
+    if is_user_logged_in() is True:
+
+        activity_type = request.args.get('activity_type')
+
+        if activity_type == "all":
+            return redirect(url_for("view_all_favourites"))
+        else:
+
+            favourites_by_activity_type = database.session.query(Favourites.activity, Favourites.participants, Favourites.type, Favourites.price,
+                                   Favourites.activityID).filter_by(UserID=session['UserID'], type=activity_type).all()
+
+            return render_template("favourites.html", users_favourites=favourites_by_activity_type)
+
+    else:
+        return redirect(url_for("login"))
+
 
 
 @app.route('/favourites/delete/<string:activity_id>', methods=['POST'])
@@ -170,7 +192,7 @@ def delete_favourite(activity_id):
             database.session.delete(activity_to_delete)
             database.session.commit()
             flash("Activity removed from your favourites.", "success")
-    return redirect(url_for('view_favourites'))
+    return redirect(request.referrer) # redirect the user back to the previous page they were on before clicking the "delete" button.
 
 
 @app.route("/activity")  # < > lets you pass value through to function as a parameter
@@ -375,7 +397,7 @@ def saveActivity():
     if is_user_logged_in() is True:
         activityID = session['activityID']
         UserID = session['UserID']
-        activityInfo = display_the_activity(activityID)
+        activityInfo = display_the_activity(activityID)[0]
 
         if check_if_activity_is_in_favourites(activityID, UserID) is True:
             flash("Activity already exists in favourites", "error")

@@ -7,26 +7,19 @@
      {% if messages %}
          {% for category,message in messages %}
          {% if category == "success" %}
-             <div class="alert alert-success mb-3 alert-dismissible fade show" role="alert" id="alert-message">
+             <div class="alert alert-success mb-3 fade show" role="alert" id="alert-message">
                  {{ message }}
              </div>
          {% endif %}
 
          {% if category == "error" %}
-             <div class="alert alert-danger mb-3 alert-dismissible fade show" role="alert" id="alert-message">
+             <div class="alert alert-danger mb-3 fade show" role="alert" id="alert-message">
                  {{ message }}
              </div>
          {% endif %}
 
-           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
-           </button>
 
-         <script>
-         setTimeout(() => {
-             document.getElementById("alert-message").style.opacity = "0";
-         }, 1700);
-         </script>
+
 
          {% endfor %}
 
@@ -35,6 +28,24 @@
 
 
 <h1>{{ session["FirstName"] }}'s favourite activities:</h1>
+
+<form action="{{ url_for('view_favourites_by_activity_type') }}" method="GET">
+    <label for="activity_type">Filter By Type Of Activity:</label>
+    <select name="activity_type" id="activity_type">
+        <option value="all">All</option>
+        <option value="education">Education</option>
+        <option value="recreational">Recreational</option>
+        <option value="social">Social</option>
+        <option value="diy">Diy</option>
+        <option value="charity">Charity</option>
+        <option value="cooking">Cooking</option>
+        <option value="relaxation">Relaxation</option>
+        <option value="music">Music</option>
+        <option value="busywork">Busywork</option>
+    </select>
+    <button type="submit">Filter</button>
+</form>
+
 <ul>
 {% for activity_info in users_favourites %}
     <li>
