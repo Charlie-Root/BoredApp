@@ -132,7 +132,7 @@ def forgotpassword():
 
         # insert something that send a password changer to their email
 
-        flash("Password reset link sent", "info")
+        flash("Password reset link sent", "success")
 
     return render_template("forgotpassword.html", emailOrUsername=emailOrUsername, form=form)
 
@@ -152,12 +152,25 @@ def view_favourites():
     """
     if is_user_logged_in() is True:
         users_favourites = (
-            database.session.query(Favourites.activity, Favourites.participants, Favourites.type, Favourites.price)
+            database.session.query(Favourites.activity, Favourites.participants, Favourites.type, Favourites.price,
+                                   Favourites.activityID)
             .filter(Favourites.UserID == session["UserID"])
             .all())
         return render_template("favourites.html", users_favourites=users_favourites)
     else:
         return redirect(url_for("login"))
+
+
+@app.route('/favourites/delete/<string:activity_id>', methods=['POST'])
+def delete_favourite(activity_id):
+    if is_user_logged_in() is True:
+        activity_to_delete = database.session.query(Favourites).filter_by(UserID=session['UserID'],
+                                                                          activityID=activity_id).first()
+        if activity_to_delete:
+            database.session.delete(activity_to_delete)
+            database.session.commit()
+            flash("Activity removed from your favourites.", "success")
+    return redirect(url_for('view_favourites'))
 
 
 @app.route("/activity")  # < > lets you pass value through to function as a parameter
