@@ -4,6 +4,7 @@ import requests
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from boredapp.config import DATABASEPASSWORD, DATABASENAME, SECRET_KEY
+from datetime import timedelta
 
 """
 Code Structure reference: 
@@ -21,6 +22,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = f"{SECRET_KEY}"  # secret key for the WTForm forms you create
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:{PASSWORD}@localhost/{DatabaseName}'.format(
     PASSWORD=DATABASEPASSWORD, DatabaseName=DATABASENAME)
+app.permanent_session_lifetime = timedelta(days=1)  # a session can last up to 1 day (unless user logs out or the server restarts)
+
 
 # Initialise the database connection
 database = SQLAlchemy(app)

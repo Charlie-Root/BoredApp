@@ -191,7 +191,6 @@ def delete_favourite(activity_id):
         if activity_to_delete:
             database.session.delete(activity_to_delete)
             database.session.commit()
-            flash("Activity removed from your favourites.", "success")
     return redirect(request.referrer) # redirect the user back to the previous page they were on before clicking the "delete" button.
 
 
