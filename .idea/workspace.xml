@@ -6,17 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="b4195fdd-46a9-47d9-b6bf-f7bce79bf27e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boredapp/Templates/activityPage.html" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/templates/activityPage.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boredapp/Templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boredapp/Templates/base1.html" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/templates/base1.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boredapp/Templates/favourites.html" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/templates/favourites.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boredapp/Templates/forgotpassword.html" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/templates/forgotpassword.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boredapp/Templates/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/templates/home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boredapp/Templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/templates/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boredapp/Templates/signup.html" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/templates/signup.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boredapp/Templates/user.html" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/templates/user.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boredapp/Database/createDatabase.sql" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/Database/createDatabase.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/boredapp/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boredapp/boredAppFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/boredAppFunctions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boredapp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/boredapp/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boredapp/templates/favourites.html" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/templates/favourites.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boredapp/templates/user.html" beforeDir="false" afterPath="$PROJECT_DIR$/boredapp/templates/user.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

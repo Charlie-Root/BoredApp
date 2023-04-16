@@ -27,7 +27,7 @@ def display_the_activity(activityID):
 
     activity_name = activity['activity']
     participant_number = activity['participants']
-    price = activity['price']
+    #price = activity['price']
     activity_type = activity['type']
     activity_link = activity['link']
 
@@ -35,8 +35,8 @@ def display_the_activity(activityID):
     # this also makes the link hyperlinked
     link_str = f"{activity_link}" if activity_link else ""
 
-    return "{}, costs £{}, it is a {} activity and can be done by {} participant{}".format(
-        activity_name, price, activity_type, participant_number, "" if participant_number == 1 else "s"), link_str
+    return "{}, it's a {} activity and can be done by {} participant{}".format(
+        activity_name, activity_type, participant_number, "" if participant_number == 1 else "s"), link_str
 
 
 def check_if_activity_is_in_favourites(activityID, UserID):

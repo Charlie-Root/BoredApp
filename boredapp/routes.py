@@ -152,7 +152,7 @@ def view_all_favourites():
     """
     if is_user_logged_in() is True:
         all_users_favourites = (
-            database.session.query(Favourites.activity, Favourites.participants, Favourites.type, Favourites.price,
+            database.session.query(Favourites.activity, Favourites.participants, Favourites.type,
                                    Favourites.activityID)
             .filter(Favourites.UserID == session["UserID"])
             .all())
@@ -173,7 +173,7 @@ def view_favourites_by_activity_type():
             return redirect(url_for("view_all_favourites"))
         else:
 
-            favourites_by_activity_type = database.session.query(Favourites.activity, Favourites.participants, Favourites.type, Favourites.price,
+            favourites_by_activity_type = database.session.query(Favourites.activity, Favourites.participants, Favourites.type,
                                    Favourites.activityID).filter_by(UserID=session['UserID'], type=activity_type).all()
 
             return render_template("favourites.html", users_favourites=favourites_by_activity_type)
@@ -224,11 +224,12 @@ def logout():
     if "Username" or "Email" in session:  # if the user has logged in
         flash("Logged out successfully", "success")
 
-    session.pop("Username", None)  # removing the data from our session dict
+    """session.pop("Username", None)  # removing the data from our session dict
     session.pop("Email", None)  # removing the data from our session dict
     session.pop("password", None)  # removing the data from our session dict
     session.pop("UserID", None)  # removing the data from our session dict
-    session.pop("FirstName", None)  # removing the data from our session dict
+    session.pop("FirstName", None)  # removing the data from our session dict"""
+    session.clear()
 
     return redirect(url_for("home"))  # when we log out ,redirect to the home page
 
@@ -289,39 +290,44 @@ def participantNumber():
     else:
         return redirect(url_for("login"))
 
-
-@app.route("/budgetRange", methods=["GET", "POST"])
-def budgetRange():
+@app.route("/freeActivity", methods=["GET", "POST"])
+def freeActivity():
     """
-        This function generates an activity from the api based on an inputted budget range.
+        This function generates a free activity from the api.
     """
     if is_user_logged_in() is True:
         if request.method == 'POST':
-            form = request.form  # get the html form
             clicked = True
-            minimumBudget = form["minimumBudget"]
-            maximumBudget = form["maximumBudget"]
+            url = "{}?minprice=0&maxprice=0".format(APIurl)
+            activity = connect_to_api(url)
 
-            # Invalid Input Handling for user input
-            regex_requirements = re.compile(r"^[0-1]")
+            activityID = activity['key']
 
-            budget_range_valid = regex_requirements.fullmatch(
-                minimumBudget, maximumBudget)  # returns ['0' if True or None is False]
+            activityInfo, link_str = display_the_activity(activityID)
 
-            if budget_range_valid:
-                url = "{}?minprice={}&maxprice={}".format(APIurl, minimumBudget, maximumBudget)
-                activity = connect_to_api(url)
+            return render_template('user.html', activityInfo=activityInfo,
+                                   clicked=clicked)
+    else:
+        return redirect(url_for("login"))
 
-                activityID = activity['key']
+@app.route("/activityThatCostsMoney", methods=["GET", "POST"])
+def activityThatCostsMoney():
+    """
+        This function generates an activity from the api that costs money.
+    """
+    if is_user_logged_in() is True:
+        if request.method == 'POST':
+            clicked = True
 
-                activityInfo, link_str = display_the_activity(activityID)
+            url = "{}?minprice=0.01&maxprice=1".format(APIurl)
+            activity = connect_to_api(url)
 
-                return render_template('user.html', activityInfo=activityInfo,
-                                       clicked=clicked, minimumBudget=minimumBudget, maximumBudget=maximumBudget)
-            else:
-                flash("Budget Range invalid, try again", "error")
-                return render_template("user.html")
+            activityID = activity['key']
 
+            activityInfo, link_str = display_the_activity(activityID)
+
+            return render_template('user.html', activityInfo=activityInfo,
+                                   clicked=clicked)
     else:
         return redirect(url_for("login"))
 
@@ -407,12 +413,11 @@ def saveActivity():
 
             activity_name = activity['activity']
             participant_number = activity['participants']
-            price = activity['price']
             activity_type = activity['type']
 
             # Run query to save activity info
             add_activity = Favourites(activityID=activityID, UserID=UserID, activity=activity_name,
-                                      participants=participant_number, price=price,
+                                      participants=participant_number,
                                       type=activity_type)
             database.session.add(add_activity)
             database.session.commit()

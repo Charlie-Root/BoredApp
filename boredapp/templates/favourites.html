@@ -49,7 +49,7 @@
 <ul>
 {% for activity_info in users_favourites %}
     <li>
-        {{ activity_info[0] }} - {{ activity_info[1] }} participant/s - {{ activity_info[2] }} activity - £{{ activity_info[3] }}
+        {{ activity_info[0] }} - no. of participants: {{ activity_info[1] }} - {{ activity_info[2] }} activity
         <form action="{{ url_for('delete_favourite', activity_id=activity_info[4]) }}" method="POST">
             <button type="submit">Delete</button>
         </form>

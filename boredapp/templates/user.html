@@ -42,18 +42,23 @@
 
 </br>
 
-<form action="{{ url_for('budgetRange') }}" method="POST">
-          <input type="text" name="£ minimumBudget" placeholder="Minimum Budget" >
-          <input type="text" name="£ maximumBudget" placeholder="Maximum Budget"  >
-          <input type="submit" name="next" value="Activity based on budget"><br>
-</form>
 
+<form action="{{ url_for('freeActivity') }}" method="POST">
+        <input type="submit" name="next" value="Free Activity">
+</form>
 
 </br>
 
+<form action="{{ url_for('activityThatCostsMoney') }}" method="POST">
+        <input type="submit" name="next" value="An activity that may cost money">
+</form>
+
+</br>
+
+
 <form action="{{ url_for('activityType') }}" method="POST">
         <input type="text" name="activityType" placeholder="Type of activity:"><input type="submit" name="next" value="Activity based on type"><br>
-        <h6>Types: education, recreational, social, diy, charity, cooking, relaxation, music, busywork</h6>
+        <h6> Activity types: Education, recreational, social, diy, charity, cooking, relaxation, music, busywork</h6>
 </form>
 
 </br>
@@ -69,29 +74,20 @@
 
 
 <!-- Improve this with an else statement so that when a user inserts nothing the random doesn't just automatically run -->
+<!-- If an activity has been generated... -->
 {% if clicked  %}
 
        <h2>Activity</h2>
        <p class = "activity">{{ activityInfo }}. <a target="_blank" href="{{ link_str }}">{{ link_str }}</a></p>
 
+       <form action="{{ url_for('saveActivity') }}" method="POST">
+            <input type="submit" name="next" value="Save Activity"><br>
+       </form>
 {% endif %}
 
-<form action="{{ url_for('saveActivity') }}" method="POST">
-       <input type="submit" name="next" value="saveActivity"><br>
-</form>
+
 
 </br>
-
-
-<!--
- <div class="alert alert-info alert-dismissible fade show" role="alert">
-         {{ message }}
-         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-         <span aria-hidden="true">&times;</span></button>
-         </div>
--->
-
-
 
 
 

@@ -22,7 +22,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = f"{SECRET_KEY}"  # secret key for the WTForm forms you create
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:{PASSWORD}@localhost/{DatabaseName}'.format(
     PASSWORD=DATABASEPASSWORD, DatabaseName=DATABASENAME)
-app.permanent_session_lifetime = timedelta(days=1)  # a session can last up to 1 day (unless user logs out or the server restarts)
+# Set the session lifetime to 30 minutes
+app.permanent_session_lifetime = timedelta(minutes=30)
 
 
 # Initialise the database connection

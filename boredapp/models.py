@@ -74,15 +74,13 @@ class Favourites(Base):
     UserID = database.Column(database.Integer, database.ForeignKey('the_users.UserID'), nullable=False)
     activity = database.Column(database.String(200), nullable=False)
     participants = database.Column(database.Integer, nullable=False)
-    price = database.Column(database.Float, nullable=False)
     type = database.Column(database.String(200), nullable=False)
 
-    def __init__(self, activityID, UserID, activity, participants, price, type):
+    def __init__(self, activityID, UserID, activity, participants, type):
         self.activityID = activityID
         self.UserID = UserID
         self.activity = activity
         self.participants = participants
-        self.price = price
         self.type = type
 
         # create 2 column index for activity id and user id.

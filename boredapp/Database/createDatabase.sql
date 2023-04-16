@@ -27,7 +27,6 @@ CREATE TABLE favourites (
     UserID INT NOT NULL,
     activity VARCHAR(200) NOT NULL,
     participants INT NOT NULL,
-    price FLOAT NOT NULL,
     type VARCHAR(200) NOT NULL,
     CONSTRAINT pk_favourites PRIMARY KEY (activityID),
     CONSTRAINT fk_favourites_the_users FOREIGN KEY (UserID) REFERENCES the_users(UserID),
