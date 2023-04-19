@@ -27,7 +27,6 @@ def display_the_activity(activityID):
 
     activity_name = activity['activity']
     participant_number = activity['participants']
-    #price = activity['price']
     activity_type = activity['type']
     activity_link = activity['link']
 

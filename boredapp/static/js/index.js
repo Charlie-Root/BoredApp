@@ -1,5 +1,4 @@
 
-
 // Get the alert element
 var alertElement = document.getElementById('alert-message');
 
