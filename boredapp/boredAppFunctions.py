@@ -1,5 +1,4 @@
 from flask import session
-from sqlalchemy import and_
 from boredapp import database, connect_to_api
 from boredapp.models import TheUsers, Favourites
 
