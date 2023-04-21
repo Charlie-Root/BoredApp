@@ -1,5 +1,3 @@
-import os
-import pathlib
 import requests
 from flask import request, flash, session, render_template, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -18,7 +16,7 @@ from .config import client_secrets_file, GOOGLE_CLIENT_ID
 APIurl = "http://www.boredapi.com/api/activity"
 
 
-
+# create a Flow object using the client secrets file and desired scopes
 flow = Flow.from_client_secrets_file(
     client_secrets_file=client_secrets_file,
     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
@@ -27,18 +25,31 @@ flow = Flow.from_client_secrets_file(
 
 @app.route("/googlelogin")
 def googlelogin():
+    """
+    Redirects the user to the Google Login page to authorize the application
+    to access their profile information.
+    """
+    # get the authorization URL and state from the Flow object
     authorization_url, state = flow.authorization_url()
+    # save the state in the session for later use
     session["state"] = state
+    # redirect the user to the authorization URL
     return redirect(authorization_url)
-
 
 @app.route("/callback")
 def callback():
+    """
+    Handles the callback request from Google after the user has authorized
+    the application to access their profile information.
+    """
+    # fetch the token from the authorization response
     flow.fetch_token(authorization_response=request.url)
 
+    # check if the state in the session matches the state in the request args
     if not session["state"] == request.args["state"]:
         abort(500)  # State does not match!
 
+    # get the user's ID token and verify it
     credentials = flow.credentials
     request_session = requests.session()
     cached_session = cachecontrol.CacheControl(request_session)
@@ -50,31 +61,28 @@ def callback():
         audience=GOOGLE_CLIENT_ID
     )
 
+    # save the user's profile information to the session
     session["FirstName"] = id_info.get("given_name")
     session["LastName"] = id_info.get("family_name")
     session["Email"] = id_info.get("email")
 
-    # save info to db
-    # Check if there's a user in the database with this username/email already
-    # this returns the user row with this email or None if it doesn't exist
+    # save the user's profile information to the database
     user_exists = database.session.query(TheUsers).filter(TheUsers.Email == session["Email"]).first()
 
     if user_exists == None : # if the user isn't already in the database
-
-        # save user into database
+        # create a new user object
         new_user = TheUsers(FirstName=session["FirstName"], LastName=session["LastName"], Email=session["Email"])
+        # add the user to the database
         database.session.add(new_user)
         database.session.commit()
-
+        # show a success message to the user
         flash("Sign Up Successful!!", "success")
 
+    # save the user's ID to the session for later use
+    session['UserID'] = get_user_id()
 
-    session['UserID'] = get_user_id()  # save the users ID to a session for later use
-
-
+    # redirect the user to the user page
     return redirect(url_for("user"))
-
-
 
 
 # FLASK APP SERVER FUNCTIONS
