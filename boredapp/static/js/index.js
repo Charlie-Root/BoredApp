@@ -6,3 +6,5 @@ var alertElement = document.getElementById('alert-message');
 setTimeout(function() {
         alertElement.remove();
     }, 2500);
+
+

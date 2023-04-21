@@ -1,3 +1,6 @@
+import os
+import pathlib
+import requests
 from flask import request, flash, session, render_template, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import app, connect_to_api, database
@@ -6,8 +9,72 @@ from boredapp.boredAppFunctions import is_user_logged_in, get_user_id, get_user_
 import re
 from boredapp.models import TheUsers, Favourites
 from boredapp.forms import SignUpForm, LogInForm, ForgotPassword
+from google.oauth2 import id_token
+from google_auth_oauthlib.flow import Flow
+from pip._vendor import cachecontrol
+import google.auth.transport.requests
+from .config import client_secrets_file, GOOGLE_CLIENT_ID
 
 APIurl = "http://www.boredapi.com/api/activity"
+
+
+
+flow = Flow.from_client_secrets_file(
+    client_secrets_file=client_secrets_file,
+    scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
+    redirect_uri="http://127.0.0.1:5000/callback"
+)
+
+@app.route("/googlelogin")
+def googlelogin():
+    authorization_url, state = flow.authorization_url()
+    session["state"] = state
+    return redirect(authorization_url)
+
+
+@app.route("/callback")
+def callback():
+    flow.fetch_token(authorization_response=request.url)
+
+    if not session["state"] == request.args["state"]:
+        abort(500)  # State does not match!
+
+    credentials = flow.credentials
+    request_session = requests.session()
+    cached_session = cachecontrol.CacheControl(request_session)
+    token_request = google.auth.transport.requests.Request(session=cached_session)
+
+    id_info = id_token.verify_oauth2_token(
+        id_token=credentials._id_token,
+        request=token_request,
+        audience=GOOGLE_CLIENT_ID
+    )
+
+    session["FirstName"] = id_info.get("given_name")
+    session["LastName"] = id_info.get("family_name")
+    session["Email"] = id_info.get("email")
+
+    # save info to db
+    # Check if there's a user in the database with this username/email already
+    # this returns the user row with this email or None if it doesn't exist
+    user_exists = database.session.query(TheUsers).filter(TheUsers.Email == session["Email"]).first()
+
+    if user_exists == None : # if the user isn't already in the database
+
+        # save user into database
+        new_user = TheUsers(FirstName=session["FirstName"], LastName=session["LastName"], Email=session["Email"])
+        database.session.add(new_user)
+        database.session.commit()
+
+        flash("Sign Up Successful!!", "success")
+
+
+    session['UserID'] = get_user_id()  # save the users ID to a session for later use
+
+
+    return redirect(url_for("user"))
+
+
 
 
 # FLASK APP SERVER FUNCTIONS
@@ -33,10 +100,6 @@ def signup():
                 form.lastname.data = ''
                 email = form.email.data
                 form.email.data = ''
-                dateofbirth = form.dateofbirth.data
-                form.dateofbirth.data = ''
-                city = form.city.data
-                form.city.data = ''
                 username = form.username.data
                 form.username.data = ''
                 password = form.password.data
@@ -53,8 +116,7 @@ def signup():
                     flash("A User already exists with this email/username.", "error")
                 else:
                     # save user into database
-                    new_user = TheUsers(FirstName=firstname, LastName=lastname, Email=email, DOB=dateofbirth,
-                                        City=city,
+                    new_user = TheUsers(FirstName=firstname, LastName=lastname, Email=email,
                                         Username=username, Password=password)  # hash password
                     database.session.add(new_user)
                     database.session.commit()

@@ -11,10 +11,8 @@ CREATE TABLE the_users (
     FirstName VARCHAR(65) NOT NULL,
     LastName VARCHAR(65) NOT NULL,
     Email VARCHAR(65) NOT NULL UNIQUE,
-    DOB DATETIME NOT NULL,
-    City VARCHAR(200) NOT NULL,
-    Username VARCHAR(200) NOT NULL,
-    Password VARCHAR(200) NOT NULL,
+    Username VARCHAR(200),
+    Password VARCHAR(200),
     CONSTRAINT pk_the_users PRIMARY KEY (UserID),
     INDEX ix_the_users_Email (Email),
     INDEX ix_the_users_Username (Username)

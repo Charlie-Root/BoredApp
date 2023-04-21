@@ -49,19 +49,13 @@ class TheUsers(Base):
     FirstName = database.Column(database.String(65), nullable=False)
     LastName = database.Column(database.String(65), nullable=False)
     Email = database.Column(database.String(65), nullable=False, unique=True, index=True)  # create index for Email column
-    DOB = database.Column(database.DateTime, nullable=False)
-    City = database.Column(database.String(200), nullable=False)
-    Username = database.Column(database.String(200), nullable=False, index=True)  # create index for Username column
-    Password = database.Column(database.String(200), nullable=False)
+    Username = database.Column(database.String(200), index=True)  # create index for Username column
+    Password = database.Column(database.String(200))
 
-    def __init__(self, FirstName, LastName, Email, DOB, City, Username, Password):
+    def __init__(self, FirstName, LastName, Email):
         self.FirstName = FirstName
         self.LastName = LastName
         self.Email = Email
-        self.DOB = DOB
-        self.City = City
-        self.Username = Username
-        self.Password = Password
 
 
 class Favourites(Base):

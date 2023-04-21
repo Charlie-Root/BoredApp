@@ -3,7 +3,7 @@ import json
 import requests
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from boredapp.config import DATABASEPASSWORD, DATABASENAME, SECRET_KEY
+from boredapp.config import DATABASEPASSWORD, DATABASENAME, SECRET_KEY, GOOGLE_CLIENT_ID
 from datetime import timedelta
 
 """
@@ -26,8 +26,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:{PASSWORD}@localho
 app.permanent_session_lifetime = timedelta(minutes=30)
 
 
+
 # Initialise the database connection
 database = SQLAlchemy(app)
+
+
+GOOGLE_CLIENT_ID = GOOGLE_CLIENT_ID
 
 
 def connect_to_api(url):
