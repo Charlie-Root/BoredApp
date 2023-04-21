@@ -14,7 +14,7 @@ APIurl = "http://www.boredapi.com/api/activity"
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     """
-        This function allows a user to sign up and check the database to see if they are already signed up or not + also checks if a user is already logged in.
+        This function allows a user to sign up and checks the database to see if they are already signed up or not + also checks if a user is already logged in.
     """
     if is_user_logged_in() is True:
         return redirect(url_for("user"))
