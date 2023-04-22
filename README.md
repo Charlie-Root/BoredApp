@@ -4,8 +4,19 @@
 🚀<b>Usage</b>:
 
 <i>The BoredApp assists users in generating a chosen activity to take part in based on the users budget,number of participants, activities with links , a specific type of activity or choose an activity at random.
-           
-I've used SQL Indexes in my Database to speed up database queries and make data retrieval more efficient.
+            
+
+My Favourite Features:
+
+- 3rd Party Google login/signup for users.
+
+- Use of SQL Indexes in my relational MYSQL database to speed up database queries and make data retrieval more efficient.
+
+- Clean & modular Code, easy to understand & well commented code.
+
+- Good test coverage.
+
+
 
 ✨<b>How to Run:</b>
 
