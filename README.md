@@ -6,7 +6,7 @@
 <i>The BoredApp assists users in generating a chosen activity to take part in based on the users budget,number of participants, activities with links , a specific type of activity or choose an activity at random.
             
 
-My Favourite Features:
+<b>My Favourite Features:</b>
 
 - 3rd Party Google login/signup for users.
 
@@ -15,6 +15,14 @@ My Favourite Features:
 - Clean & modular Code, easy to understand & well commented code.
 
 - Good test coverage.
+
+<b>Things to add:</b>
+
+- 'forgot password' feature
+
+- Dynamic front end design & styling
+
+
 
 
 
