@@ -14,7 +14,7 @@
 
 - Clean & modular Code, easy to understand & well commented code.
 
-- Good test coverage.
+- Unit testing for good test coverage.
 
 <b>Things to add:</b>
 
