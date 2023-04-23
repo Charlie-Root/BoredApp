@@ -3,7 +3,7 @@
 
 🚀<b>Usage</b>:
 
-<i>The BoredApp assists users in generating a chosen activity to take part in based on the users budget,number of participants, activities with links , a specific type of activity or choose an activity at random.
+<i>The BoredApp assists users in generating a chosen activity to take part in based on number of participants,free & paid activities, paid activities with associated links, a specific type of activity or choose an activity at random.
             
 
 <b>My Favourite Features:</b>
