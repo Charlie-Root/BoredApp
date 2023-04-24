@@ -52,10 +52,14 @@ class TheUsers(Base):
     Username = database.Column(database.String(200), index=True)  # create index for Username column
     Password = database.Column(database.String(200))
 
-    def __init__(self, FirstName, LastName, Email):
+    #Token = database.Column(database.String(200))
+
+
+    def __init__(self, FirstName, LastName, Email,Token=""):
         self.FirstName = FirstName
         self.LastName = LastName
         self.Email = Email
+        #self.Token = Token
 
 
 class Favourites(Base):

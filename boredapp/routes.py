@@ -1,3 +1,5 @@
+import secrets
+
 import requests
 from flask import request, flash, session, render_template, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,6 +14,7 @@ from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
 from .config import client_secrets_file, GOOGLE_CLIENT_ID
+from flask_mail import Message, Mail
 
 APIurl = "http://www.boredapi.com/api/activity"
 
@@ -184,12 +187,12 @@ def login():
     else:
         return redirect(url_for("user"))
 
-
+"""
 @app.route("/forgotpassword", methods=["POST", "GET"])
 def forgotpassword():
-    """
-        This function allows a user to reset their password via an external link using their email or username.
-    """
+"""
+        #This function allows a user to reset their password via an external link using their email or username.
+"""
     emailOrUsername = None
     form = ForgotPassword()
 
@@ -200,11 +203,43 @@ def forgotpassword():
             emailOrUsername = form.emailOrUsername.data
             form.emailOrUsername.data = ''
 
-        # insert something that send a password changer to their email
+            # check if a username or email was entered
+            if "@" in emailOrUsername:
+                user = database.session.query(TheUsers).filter_by(Email=emailOrUsername).first()
+            else:
+                user = database.session.query(TheUsers).filter_by(Username=emailOrUsername).first()
 
-        flash("Password reset link sent", "success")
+            # if a userexists in the database with this username/email
+            if user:
+
+                # Generate a unique token
+                newToken = secrets.token_urlsafe(16)
+
+                # Update the user's token attribute
+                user.token = newToken
+
+                # Commit the changes to the database
+                database.session.commit()
+
+                # Send an email with the reset link
+                reset_link = url_for('reset_password_confirm', token=newToken, _external=True)
+                msg = Message('Password Reset Request', recipients=user.Email)
+                msg.body = f"To reset your password, click on the following link: {reset_link}"
+
+                Mail.send(msg)
+                flash('An email has been sent with instructions to reset your password.', 'success')
+
+            else:
+                flash("No account found with that email or username", "error")
 
     return render_template("forgotpassword.html", emailOrUsername=emailOrUsername, form=form)
+
+
+@app.route("/")
+def reset_password_confirm():
+    pass
+"""
+
 
 
 @app.route("/")
@@ -497,3 +532,4 @@ def saveActivity():
         return render_template('user.html', clicked=True, activityInfo=activityInfo)
     else:
         return redirect(url_for("login"))
+

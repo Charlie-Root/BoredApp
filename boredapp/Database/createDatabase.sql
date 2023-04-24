@@ -13,6 +13,7 @@ CREATE TABLE the_users (
     Email VARCHAR(65) NOT NULL UNIQUE,
     Username VARCHAR(200),
     Password VARCHAR(200),
+    --Token VARCHAR(200),
     CONSTRAINT pk_the_users PRIMARY KEY (UserID),
     INDEX ix_the_users_Email (Email),
     INDEX ix_the_users_Username (Username)

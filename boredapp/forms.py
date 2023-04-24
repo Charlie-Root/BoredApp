@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, StringField, PasswordField, EmailField
 from wtforms.validators import DataRequired
-
+from flask_mail import Message,Mail
 
 # Form for sign up
 class SignUpForm(FlaskForm):
@@ -34,3 +34,21 @@ class ForgotPassword(FlaskForm):
     """
     emailOrUsername = StringField("emailOrUsername:", validators=[DataRequired()])
     submit = SubmitField("Reset Password")
+
+"""
+app = Flask(__name__)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'your-email@gmail.com' # replace with your email address
+app.config['MAIL_PASSWORD'] = 'your-email-password' # replace with your email password
+
+mail = Mail(app)
+
+@app.route('/send_email')
+def send_email():
+    msg = Message('Test Email', recipients=['recipient@example.com'])
+    msg.body = 'This is a test email sent from Flask!'
+    mail.send(msg)
+    return 'Email sent!'
+"""

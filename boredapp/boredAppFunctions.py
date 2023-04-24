@@ -1,6 +1,9 @@
+import secrets
+
 from flask import session
 from boredapp import database, connect_to_api
 from boredapp.models import TheUsers, Favourites
+from flask_mail import Message
 
 APIurl = "http://www.boredapi.com/api/activity"
 
@@ -98,3 +101,4 @@ def is_user_logged_in():
         return True
     else:
         return False
+
