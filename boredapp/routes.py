@@ -14,7 +14,6 @@ from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
 from .config import client_secrets_file, GOOGLE_CLIENT_ID
-from flask_mail import Message, Mail
 
 APIurl = "http://www.boredapi.com/api/activity"
 

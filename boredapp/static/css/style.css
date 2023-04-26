@@ -1,4 +1,6 @@
-
+body{
+    background-color: rgb(254, 173, 255);
+}
 
 li {
     list-style-type: none;
