@@ -1,5 +1,7 @@
 
 from flask import session
+from werkzeug.security import generate_password_hash
+
 from boredapp import database, connect_to_api
 from boredapp.models import TheUsers, Favourites
 
@@ -101,6 +103,15 @@ def is_user_logged_in():
         return False
 
 
-def reset_user_password(user_email):
+def reset_user_password(user_email, new_password):
 
-    pass
+    current_user = database.session.query(TheUsers).filter_by(Email=user_email).first()
+    hashed_password = generate_password_hash(new_password)
+
+    if current_user.Password == hashed_password:  # fix this validation as it's not working
+        return False
+
+    current_user.Password = hashed_password
+    database.session.commit()
+    return True
+

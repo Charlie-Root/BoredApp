@@ -15,17 +15,18 @@ from boredapp.forms import SignUpForm, LogInForm, ForgotPassword, ResetPassword
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 import google.auth.transport.requests
-from .config import client_secrets_file, GOOGLE_CLIENT_ID,MYEMAILPASSWORD,MYEMAIL
+from .config import client_secrets_file, GOOGLE_CLIENT_ID, MYEMAILPASSWORD, MYEMAIL
 
 APIurl = "http://www.boredapi.com/api/activity"
-
 
 # create a Flow object using the client secrets file and desired scopes
 flow = Flow.from_client_secrets_file(
     client_secrets_file=client_secrets_file,
-    scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
+    scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email",
+            "openid"],
     redirect_uri="http://127.0.0.1:5000/callback"
 )
+
 
 @app.route("/googlelogin")
 def googlelogin():
@@ -39,6 +40,7 @@ def googlelogin():
     session["state"] = state
     # redirect the user to the authorization URL
     return redirect(authorization_url)
+
 
 @app.route("/callback")
 def callback():
@@ -66,7 +68,8 @@ def callback():
 
     # validate the token based on the issued_at time
     issued_at = datetime.fromtimestamp(id_info["iat"], timezone.utc)
-    valid_delta = timedelta(minutes=15)  # ensures that any access tokens created within the past 15 minutes will be valid, while access tokens issued more than 15 minutes ago will be considered invalid
+    valid_delta = timedelta(
+        minutes=15)  # ensures that any access tokens created within the past 15 minutes will be valid, while access tokens issued more than 15 minutes ago will be considered invalid
     if datetime.now(timezone.utc) - issued_at > valid_delta:
         abort(500)  # Token is not yet valid!
 
@@ -78,7 +81,7 @@ def callback():
     # save the user's profile information to the database
     user_exists = database.session.query(TheUsers).filter(TheUsers.Email == session["Email"]).first()
 
-    if user_exists == None : # if the user isn't already in the database
+    if user_exists == None:  # if the user isn't already in the database
         # create a new user object
         new_user = TheUsers(FirstName=session["FirstName"], LastName=session["LastName"], Email=session["Email"])
         # add the user to the database
@@ -92,6 +95,7 @@ def callback():
 
     # redirect the user to the user page
     return redirect(url_for("user"))
+
 
 # FLASK APP SERVER FUNCTIONS
 @app.route("/signup", methods=["GET", "POST"])
@@ -216,7 +220,8 @@ def forgotpassword():
                 subject = 'Reset Your Password'
                 body = f"Click the following link to reset your BoredApp password: {reset_password_url}"
                 message = f'Subject: {subject}\n\n{body}'
-                smtp.sendmail('from@example.com', user_email, message)  # Email the user with a link to reset their password
+                smtp.sendmail('from@example.com', user_email,
+                              message)  # Email the user with a link to reset their password
 
         flash("A password reset link will be sent to this email if this user exists.", "success")
     return render_template('forgotpassword.html', form=form)
@@ -234,16 +239,20 @@ def reset_password(token):
 
     if form.validate_on_submit():
         # Process the form submission
-        #
-        #reset_user_password(user_email)
+        new_password = form.confirm_password.data
+        isResetSuccessful = reset_user_password(email, new_password)
         # if the user is logged in, log them out
 
-        flash("Password Reset", "success")
-        if is_user_logged_in() is True:
-            return redirect(url_for("logout"))
-        return redirect(url_for("login"))
+        if isResetSuccessful:
 
+            flash("Password updated successfully", "success")
+            if is_user_logged_in() is True:
+                return redirect(url_for("logout"))
+            return redirect(url_for("login"))
+
+        flash("New password cannot be the same as the current password", "error")
     return render_template('reset_password.html', form=form)
+
 
 @app.route("/")
 def home():
@@ -268,7 +277,8 @@ def view_all_favourites():
     else:
         return redirect(url_for("login"))
 
-@app.route('/favourites/',methods=['GET', 'POST'])
+
+@app.route('/favourites/', methods=['GET', 'POST'])
 def view_favourites_by_activity_type():
     """
         This function displays a user's favourite activities page if they are logged in or takes them to the login page if they are not.
@@ -281,14 +291,15 @@ def view_favourites_by_activity_type():
             return redirect(url_for("view_all_favourites"))
         else:
 
-            favourites_by_activity_type = database.session.query(Favourites.activity, Favourites.participants, Favourites.type,
-                                   Favourites.activityID).filter_by(UserID=session['UserID'], type=activity_type).all()
+            favourites_by_activity_type = database.session.query(Favourites.activity, Favourites.participants,
+                                                                 Favourites.type,
+                                                                 Favourites.activityID).filter_by(
+                UserID=session['UserID'], type=activity_type).all()
 
             return render_template("favourites.html", users_favourites=favourites_by_activity_type)
 
     else:
         return redirect(url_for("login"))
-
 
 
 @app.route('/favourites/delete/<string:activity_id>', methods=['POST'])
@@ -299,7 +310,8 @@ def delete_favourite(activity_id):
         if activity_to_delete:
             database.session.delete(activity_to_delete)
             database.session.commit()
-    return redirect(request.referrer) # redirect the user back to the previous page they were on before clicking the "delete" button.
+    return redirect(
+        request.referrer)  # redirect the user back to the previous page they were on before clicking the "delete" button.
 
 
 @app.route("/activity")  # < > lets you pass value through to function as a parameter
@@ -393,6 +405,7 @@ def participantNumber():
     else:
         return redirect(url_for("login"))
 
+
 @app.route("/freeActivity", methods=["GET", "POST"])
 def freeActivity():
     """
@@ -412,6 +425,7 @@ def freeActivity():
                                    clicked=clicked)
     else:
         return redirect(url_for("login"))
+
 
 @app.route("/activityThatCostsMoney", methods=["GET", "POST"])
 def activityThatCostsMoney():
@@ -530,4 +544,3 @@ def saveActivity():
         return render_template('user.html', clicked=True, activityInfo=activityInfo)
     else:
         return redirect(url_for("login"))
-
