@@ -1,4 +1,5 @@
 import secrets
+from datetime import datetime, timezone, timedelta
 
 import requests
 from flask import request, flash, session, render_template, redirect, url_for
@@ -11,7 +12,6 @@ from boredapp.models import TheUsers, Favourites
 from boredapp.forms import SignUpForm, LogInForm, ForgotPassword
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
-from pip._vendor import cachecontrol
 import google.auth.transport.requests
 from .config import client_secrets_file, GOOGLE_CLIENT_ID
 
@@ -53,15 +53,20 @@ def callback():
 
     # get the user's ID token and verify it
     credentials = flow.credentials
-    request_session = requests.session()
-    cached_session = cachecontrol.CacheControl(request_session)
-    token_request = google.auth.transport.requests.Request(session=cached_session)
+    jsonWebToken = credentials.id_token
+    token_request = google.auth.transport.requests.Request()
 
     id_info = id_token.verify_oauth2_token(
-        id_token=credentials._id_token,
+        id_token=jsonWebToken,
         request=token_request,
         audience=GOOGLE_CLIENT_ID
     )
+
+    # validate the token based on the issued_at time
+    issued_at = datetime.fromtimestamp(id_info["iat"], timezone.utc)
+    valid_delta = timedelta(minutes=15)  # ensures that any access tokens created within the past 15 minutes will be valid, while access tokens issued more than 15 minutes ago will be considered invalid
+    if datetime.now(timezone.utc) - issued_at > valid_delta:
+        abort(500)  # Token is not yet valid!
 
     # save the user's profile information to the session
     session["FirstName"] = id_info.get("given_name")
@@ -85,7 +90,6 @@ def callback():
 
     # redirect the user to the user page
     return redirect(url_for("user"))
-
 
 # FLASK APP SERVER FUNCTIONS
 @app.route("/signup", methods=["GET", "POST"])
