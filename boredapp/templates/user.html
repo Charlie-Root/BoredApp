@@ -30,41 +30,41 @@
 
 </br>
 
-<form action="{{ url_for('randomActivity') }}" method="POST">
+<form action="{{ url_for('random_activity') }}" method="POST">
         <input type="submit" name="next" value="Random Activity">
 </form>
 
 </br>
 
-<form action="{{ url_for('participantNumber') }}" method="POST">
+<form action="{{ url_for('participant_number') }}" method="POST">
         <input type="text" name="participants" placeholder="No. of participants [1-5]or [8]:"><input type="submit" name="next" value="Activity based on participant number"><br>
 </form>
 
 </br>
 
 
-<form action="{{ url_for('freeActivity') }}" method="POST">
+<form action="{{ url_for('free_activity') }}" method="POST">
         <input type="submit" name="next" value="Free Activity">
 </form>
 
 </br>
 
-<form action="{{ url_for('activityThatCostsMoney') }}" method="POST">
+<form action="{{ url_for('activity_that_costs_money') }}" method="POST">
         <input type="submit" name="next" value="An activity that may cost money">
 </form>
 
 </br>
 
 
-<form action="{{ url_for('activityType') }}" method="POST">
-        <input type="text" name="activityType" placeholder="Type of activity:"><input type="submit" name="next" value="Activity based on type"><br>
+<form action="{{ url_for('activity_type') }}" method="POST">
+        <input type="text" name="activity_type" placeholder="Type of activity:"><input type="submit" name="next" value="Activity based on type"><br>
         <h6> Activity types: Education, recreational, social, diy, charity, cooking, relaxation, music, busywork</h6>
 </form>
 
 </br>
 
-<form action="{{ url_for('activityLinked') }}" method="POST">
-        <input type="submit" name="activityLinked" value="Activity With A Link">
+<form action="{{ url_for('activity_linked') }}" method="POST">
+        <input type="submit" name="activity_linked" value="Activity With A Link">
 </form>
 
 </br>
@@ -80,7 +80,7 @@
        <h2>Activity</h2>
        <p class = "activity">{{ activityInfo }}. <a target="_blank" href="{{ link_str }}">{{ link_str }}</a></p>
 
-       <form action="{{ url_for('saveActivity') }}" method="POST">
+       <form action="{{ url_for('save_activity') }}" method="POST">
             <input type="submit" name="next" value="Save Activity"><br>
        </form>
 {% endif %}

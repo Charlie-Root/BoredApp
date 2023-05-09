@@ -1,20 +1,19 @@
-import secrets
+import re
 import smtplib
 from datetime import datetime, timezone, timedelta
 
-import requests
+import google.auth.transport.requests
 from flask import request, flash, session, render_template, redirect, url_for
-from itsdangerous import TimedSerializer
-from werkzeug.security import generate_password_hash, check_password_hash
-from . import app, connect_to_api, database
-from boredapp.boredAppFunctions import is_user_logged_in, get_user_id, get_user_firstname, \
-    display_the_activity, check_if_activity_is_in_favourites, reset_user_password
-import re
-from boredapp.models import TheUsers, Favourites
-from boredapp.forms import SignUpForm, LogInForm, ForgotPassword, ResetPassword
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
-import google.auth.transport.requests
+from itsdangerous import TimedSerializer
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from boredapp.boredAppFunctions import is_user_logged_in, get_user_id, get_user_firstname, \
+    display_the_activity, check_if_activity_is_in_favourites, reset_user_password, check_if_strong_password
+from boredapp.forms import SignUpForm, LogInForm, ForgotPassword, ResetPassword
+from boredapp.models import TheUsers, Favourites
+from . import app, connect_to_api, database
 from .config import client_secrets_file, GOOGLE_CLIENT_ID, MYEMAILPASSWORD, MYEMAIL
 
 APIurl = "http://www.boredapi.com/api/activity"
@@ -28,8 +27,8 @@ flow = Flow.from_client_secrets_file(
 )
 
 
-@app.route("/googlelogin")
-def googlelogin():
+@app.route("/google_login")
+def google_login():
     """
     Redirects the user to the Google Login page to authorize the application
     to access their profile information.
@@ -57,11 +56,11 @@ def callback():
 
     # get the user's ID token and verify it
     credentials = flow.credentials
-    jsonWebToken = credentials.id_token
+    json_web_token = credentials.id_token
     token_request = google.auth.transport.requests.Request()
 
     id_info = id_token.verify_oauth2_token(
-        id_token=jsonWebToken,
+        id_token=json_web_token,
         request=token_request,
         audience=GOOGLE_CLIENT_ID
     )
@@ -98,8 +97,8 @@ def callback():
 
 
 # FLASK APP SERVER FUNCTIONS
-@app.route("/signup", methods=["GET", "POST"])
-def signup():
+@app.route("/sign_up", methods=["GET", "POST"])
+def sign_up():
     """
         This function allows a user to sign up and checks the database to see if they are already signed up or not + also checks if a user is already logged in.
     """
@@ -109,11 +108,11 @@ def signup():
         firstname = lastname = email = dateofbirth = city = username = password = None
         form = SignUpForm()
 
-        # if a POST request was made from the signup page
+        # if a POST request was made from the sign_up page
         if request.method == "POST":
 
             # if the inputted form data is all valid.
-            if form.validate_on_submit():
+            if form.validate_on_submit() and check_if_strong_password(form.password.data) is True:
                 firstname = form.firstname.data
                 form.firstname.data = ''
                 lastname = form.lastname.data
@@ -142,8 +141,9 @@ def signup():
                     database.session.commit()
 
                     flash("Sign Up Successful!!", "success")
+
             else:
-                flash("Signup details are invalid", "error")
+                flash("A stronger password is needed", "error")
 
         return render_template("signup.html", firstname=firstname, lastname=lastname, email=email,
                                dateofbirth=dateofbirth,
@@ -156,15 +156,15 @@ def login():
         This function allows a user to log in and check the database to see if their log in credentials are correct + also checks if a user is already logged in.
     """
     if is_user_logged_in() is False:
-        emailOrUsername = password = None
+        email_or_username = password = None
         form = LogInForm()
 
-        # if a POST request was made from the signup page
+        # if a POST request was made from the sign_up page
         if request.method == "POST":
             # if the inputted form data is all valid.
             if form.validate_on_submit():
-                emailOrUsername = form.emailOrUsername.data
-                form.emailOrUsername.data = ''
+                email_or_username = form.email_or_username.data
+                form.email_or_username.data = ''
                 password = form.password.data
                 form.password.data = ''
 
@@ -172,12 +172,12 @@ def login():
                 # returns a value or none if a user doesn't exist with these matching credentials
 
                 # check if a username or email was entered
-                if "@" in emailOrUsername:
-                    session['Email'] = emailOrUsername  # saves the users email into the session
-                    user = database.session.query(TheUsers).filter_by(Email=emailOrUsername).first()
+                if "@" in email_or_username:
+                    session['Email'] = email_or_username  # saves the users email into the session
+                    user = database.session.query(TheUsers).filter_by(Email=email_or_username).first()
                 else:
-                    session['Username'] = emailOrUsername  # saves the users email into the session
-                    user = database.session.query(TheUsers).filter_by(Username=emailOrUsername).first()
+                    session['Username'] = email_or_username  # saves the users email into the session
+                    user = database.session.query(TheUsers).filter_by(Username=email_or_username).first()
 
                 # if a user exists in the database with this username/email
                 if user:
@@ -191,22 +191,22 @@ def login():
 
                 flash("Log in Unsuccessful, Please try again!", "error")
 
-        return render_template("login.html", emailOrUsername=emailOrUsername, password=password, form=form)
+        return render_template("login.html", email_or_username=email_or_username, password=password, form=form)
 
     else:
         return redirect(url_for("user"))
 
 
-@app.route("/forgotpassword", methods=["POST", "GET"])
-def forgotpassword():
+@app.route("/forgot_password", methods=["POST", "GET"])
+def forgot_password():
     form = ForgotPassword()
     if form.validate_on_submit():
         user_email = form.email.data
 
         # Check if the email exists in your database
-        userExists = database.session.query(TheUsers).filter_by(Email=user_email).first()
+        user_exists = database.session.query(TheUsers).filter_by(Email=user_email).first()
 
-        if userExists:  # if user with this email exists in database
+        if user_exists:  # if user with this email exists in database
             # Generate a unique token for the user
             ts = TimedSerializer(app.secret_key)
             token = ts.dumps(user_email, salt='reset-password')
@@ -234,24 +234,23 @@ def reset_password(token):
         email = ts.loads(token, salt='reset-password', max_age=86400)
     except:
         flash("Invalid or expired token", "error")
-        return redirect(url_for('forgotpassword'))
+        return redirect(url_for('forgot_password'))
     form = ResetPassword()
 
     if form.validate_on_submit():
         # Process the form submission
         new_password = form.confirm_password.data
-        isResetSuccessful = reset_user_password(email, new_password)
+        is_reset_successful = reset_user_password(email, new_password)
         # if the user is logged in, log them out
 
-        if isResetSuccessful:
-
+        if is_reset_successful:
             flash("Password updated successfully", "success")
             if is_user_logged_in() is True:
                 return redirect(url_for("logout"))
             return redirect(url_for("login"))
 
         flash("New password cannot be the same as the current password", "error")
-    return render_template('reset_password.html', form=form)
+    return render_template('resetpassword.html', form=form)
 
 
 @app.route("/")
@@ -320,7 +319,7 @@ def activity():
         This function displays a user's activity page if they are logged in or takes them to the login page if they are not.
     """
     if is_user_logged_in() is True:
-        return render_template("activityPage.html")
+        return render_template("activitypage.html")
     else:
         return redirect(url_for("login"))
 
@@ -349,8 +348,8 @@ def logout():
     return redirect(url_for("home"))  # when we log out ,redirect to the home page
 
 
-@app.route("/randomActivity", methods=["GET", "POST"])
-def randomActivity():
+@app.route("/random_activity", methods=["GET", "POST"])
+def random_activity():
     """
         This function generates a random activity from the api.
     """
@@ -360,18 +359,18 @@ def randomActivity():
             url = "{}/".format(APIurl)
             activity = connect_to_api(url)
 
-            activityID = activity['key']
+            activity_id = activity['key']
 
-            activityInfo, link_str = display_the_activity(activityID)
+            activity_info, link_str = display_the_activity(activity_id)
 
-            return render_template('user.html', activityInfo=activityInfo,
+            return render_template('user.html', activityInfo=activity_info,
                                    clicked=clicked)
     else:
         return redirect(url_for("login"))
 
 
-@app.route("/participantNumber", methods=["GET", "POST"])
-def participantNumber():
+@app.route("/participant_number", methods=["GET", "POST"])
+def participant_number():
     """
         This function generates an activity from the api based on an inputted number of participants.
     """
@@ -392,11 +391,11 @@ def participantNumber():
                 url = "{}?participants={}".format(APIurl, number_of_participants)
                 activity = connect_to_api(url)
 
-                activityID = activity['key']
+                activity_id = activity['key']
 
-                activityInfo, link_str = display_the_activity(activityID)
+                activity_info, link_str = display_the_activity(activity_id)
 
-                return render_template('user.html', activityInfo=activityInfo,
+                return render_template('user.html', activityInfo=activity_info,
                                        clicked=clicked, number_of_participants=number_of_participants)
             else:
                 flash("Enter a Participant number from 1-5 or 8.", "error")
@@ -406,8 +405,8 @@ def participantNumber():
         return redirect(url_for("login"))
 
 
-@app.route("/freeActivity", methods=["GET", "POST"])
-def freeActivity():
+@app.route("/free_activity", methods=["GET", "POST"])
+def free_activity():
     """
         This function generates a free activity from the api.
     """
@@ -417,18 +416,18 @@ def freeActivity():
             url = "{}?minprice=0&maxprice=0".format(APIurl)
             activity = connect_to_api(url)
 
-            activityID = activity['key']
+            activity_id = activity['key']
 
-            activityInfo, link_str = display_the_activity(activityID)
+            activity_info, link_str = display_the_activity(activity_id)
 
-            return render_template('user.html', activityInfo=activityInfo,
+            return render_template('user.html', activityInfo=activity_info,
                                    clicked=clicked)
     else:
         return redirect(url_for("login"))
 
 
-@app.route("/activityThatCostsMoney", methods=["GET", "POST"])
-def activityThatCostsMoney():
+@app.route("/activity_that_costs_money", methods=["GET", "POST"])
+def activity_that_costs_money():
     """
         This function generates an activity from the api that costs money.
     """
@@ -439,18 +438,18 @@ def activityThatCostsMoney():
             url = "{}?minprice=0.01&maxprice=1".format(APIurl)
             activity = connect_to_api(url)
 
-            activityID = activity['key']
+            activity_id = activity['key']
 
-            activityInfo, link_str = display_the_activity(activityID)
+            activity_info, link_str = display_the_activity(activity_id)
 
-            return render_template('user.html', activityInfo=activityInfo,
+            return render_template('user.html', activityInfo=activity_info,
                                    clicked=clicked)
     else:
         return redirect(url_for("login"))
 
 
-@app.route("/activityType", methods=["GET", "POST"])
-def activityType():
+@app.route("/activity_type", methods=["GET", "POST"])
+def activity_type():
     """
         This function generates an activity from the api based on an inputted activity type.
     """
@@ -458,7 +457,7 @@ def activityType():
         if request.method == 'POST':
             form = request.form  # get the html form
             clicked = True
-            activityType = form["activityType"]
+            activity_type = form["activity_type"]
 
             # Invalid Input Handling for user input
             # It is made not case-sensitive
@@ -466,19 +465,19 @@ def activityType():
                 r"\b(education|recreational|social|diy|charity|cooking|relaxation|music|busywork)\b", re.IGNORECASE)
 
             activity_type_valid = regex_requirements.fullmatch(
-                activityType)  # returns ['0' if True or None is False]
+                activity_type)  # returns ['0' if True or None is False]
 
             if activity_type_valid:
                 url = "{}?type={}".format(APIurl,
-                                          activityType.lower())  # .lower(): we make it all lowercase here to ensure we can correctly access the api key without errors since the user input it not case sensitive
+                                          activity_type.lower())  # .lower(): we make it all lowercase here to ensure we can correctly access the api key without errors since the user input it not case sensitive
                 activity = connect_to_api(url)
 
-                activityID = activity['key']
+                activity_id = activity['key']
 
-                activityInfo, link_str = display_the_activity(activityID)
+                activity_info, link_str = display_the_activity(activity_id)
 
-                return render_template('user.html', activityInfo=activityInfo,
-                                       clicked=clicked, activityType=activityType)
+                return render_template('user.html', activityInfo=activity_info,
+                                       clicked=clicked, activityType=activity_type)
             else:
                 flash("Activity Type invalid, try again.", "error")
                 return render_template("user.html")
@@ -487,8 +486,8 @@ def activityType():
         return redirect(url_for("login"))
 
 
-@app.route("/activityLinked", methods=["GET", "POST"])
-def activityLinked():
+@app.route("/activity_linked", methods=["GET", "POST"])
+def activity_linked():
     """
         This function generates an activity from the api that has a link attached to it.
     """
@@ -502,30 +501,30 @@ def activityLinked():
                 activity = connect_to_api(url)
 
                 if activity['link']:
-                    activityID = activity['key']
-                    activityInfo, link_str = display_the_activity(activityID)
+                    activity_id = activity['key']
+                    activity_info, link_str = display_the_activity(activity_id)
 
-                    return render_template('user.html', activityInfo=activityInfo, clicked=True, link_str=link_str)
+                    return render_template('user.html', activityInfo=activity_info, clicked=True, link_str=link_str)
 
     else:
         return redirect(url_for("login"))
 
 
-@app.route("/saveActivity", methods=["GET", "POST"])
-def saveActivity():
+@app.route("/save_activity", methods=["GET", "POST"])
+def save_activity():
     """
         This function saves an activity into the database and also checks if the activity is already in the database or not.
     """
     if is_user_logged_in() is True:
-        activityID = session['activityID']
-        UserID = session['UserID']
-        activityInfo = display_the_activity(activityID)[0]
+        activity_id = session['activityID']
+        user_id = session['UserID']
+        activity_info = display_the_activity(activity_id)[0]
 
-        if check_if_activity_is_in_favourites(activityID, UserID) is True:
+        if check_if_activity_is_in_favourites(activity_id, user_id) is True:
             flash("Activity already exists in favourites", "error")
         else:
             # Connect to API to get activity info
-            url = "{}?key={}".format(APIurl, activityID)
+            url = "{}?key={}".format(APIurl, activity_id)
             activity = connect_to_api(url)
 
             activity_name = activity['activity']
@@ -533,7 +532,7 @@ def saveActivity():
             activity_type = activity['type']
 
             # Run query to save activity info
-            add_activity = Favourites(activityID=activityID, UserID=UserID, activity=activity_name,
+            add_activity = Favourites(activityID=activity_id, UserID=user_id, activity=activity_name,
                                       participants=participant_number,
                                       type=activity_type)
             database.session.add(add_activity)
@@ -541,6 +540,6 @@ def saveActivity():
 
             flash("Activity saved to favourites!", "success")
 
-        return render_template('user.html', clicked=True, activityInfo=activityInfo)
+        return render_template('user.html', clicked=True, activityInfo=activity_info)
     else:
         return redirect(url_for("login"))

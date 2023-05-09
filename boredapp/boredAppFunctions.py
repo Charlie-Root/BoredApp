@@ -1,11 +1,12 @@
+import re
 
 from flask import session
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from boredapp import database, connect_to_api
 from boredapp.models import TheUsers, Favourites
 
-APIurl = "http://www.boredapi.com/api/activity"
+api_url = "http://www.boredapi.com/api/activity"
 
 
 # note: Since we've created an index for the 'email' column, 'username' column and a double column index for the 'activityID' and 'UserID' Column,
@@ -21,7 +22,7 @@ def display_the_activity(activityID):
     if activityID is None:
         return "No activity has been selected"
 
-    url = "{}?key={}".format(APIurl, activityID)
+    url = "{}?key={}".format(api_url, activityID)
     activity = connect_to_api(url)
 
     session[
@@ -44,9 +45,9 @@ def check_if_activity_is_in_favourites(activityID, UserID):
     """
         This function checks the database to see if the activity that the user wants to save is already saved in the database or not.
     """
-    favouritesExists = database.session.query(Favourites).filter_by(activityID=activityID, UserID=UserID).first()
+    favourites_exists = database.session.query(Favourites).filter_by(activityID=activityID, UserID=UserID).first()
 
-    if favouritesExists:  # if True
+    if favourites_exists:  # if True
         return True
     else:  # if False
         return False
@@ -68,9 +69,9 @@ def get_user_id():
     else:
         return "User is not logged in"
 
-    UserID = current_user.UserID  # select their UserID column
+    user_id = current_user.UserID  # select their UserID column
 
-    return UserID
+    return user_id
 
 
 def get_user_firstname():
@@ -88,9 +89,9 @@ def get_user_firstname():
     else:
         return "User is not logged in"
 
-    FirstName = current_user.FirstName  # select their FirstName column
+    firstname = current_user.FirstName  # select their FirstName column
 
-    return FirstName.capitalize()
+    return firstname.capitalize()
 
 
 def is_user_logged_in():
@@ -108,10 +109,25 @@ def reset_user_password(user_email, new_password):
     current_user = database.session.query(TheUsers).filter_by(Email=user_email).first()
     hashed_password = generate_password_hash(new_password)
 
-    if current_user.Password == hashed_password:  # fix this validation as it's not working
+    if check_password_hash(current_user.Password, new_password):  #  we must use this specific function to check if they are the same (instead of comparing the users current password to the new 'hashed_password') because the hashing algorithm adds a random salt value, so the hash values will be different even for the same password.
         return False
 
     current_user.Password = hashed_password
     database.session.commit()
     return True
+
+def check_if_strong_password(password):
+    # At least one uppercase letter, one lowercase letter, one digit, and one special character
+
+    regex_requirements = re.compile(
+        r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@!#$%^&*_\-])(?!.*[~`\[\]{}()+=\\|;:'\",<.>?/]).{8,}$")
+
+    is_password_strong = regex_requirements.fullmatch(password)        # returns ['0' if True or None is False]
+
+    if is_password_strong:
+        return True
+    return False
+
+
+
 

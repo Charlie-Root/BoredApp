@@ -19,42 +19,31 @@
              </div>
          {% endif %}
 
-
-
          {% endfor %}
 
      {% endif%}
      {% endwith %}
 
 
-<h1> The BoredApp</h1>
+<a href="{{ url_for('home') }}"><h1>The BoredApp</h1></a>
 <h2> Log into your Account</h2>
 
 
 <!-- WTF-Flask FORM  -->
 <form method="POST">
     {{ form.hidden_tag() }}  <!-- This will create our csrf token-->
-    <p>{{ form.emailOrUsername(placeholder="Enter Email or Username") }}</p>
+    <p>{{ form.email_or_username(placeholder="Enter Email or Username") }}</p>
     <p>{{ form.password(placeholder="Enter Password") }}</p>
-    <br/>
     {{ form.submit() }}
 </form>
 
 <br/>
+<a href="{{ url_for('google_login') }}">
+    <img src="{{ url_for('static', filename='images/google_signin.png') }}" alt="Sign in with Google">
+</a>
 
-<p>Don't have an Account?<a href="{{url_for('signup')}}"> Sign up</a></p>
-<p>Forgot Password?<a href="{{url_for('forgotpassword')}}"> Forgot Password</a></p>
+<p>Don't have an Account?<a href="{{url_for('sign_up')}}"> Sign up</a></p>
+<p>Forgot Password?<a href="{{url_for('forgot_password')}}"> Forgot Password</a></p>
 
-
-<!-- HTML FORM -->
-
-<!-- <form action="#" method="POST">
-    <p><input type="text" name="emailOrUsername" placeholder="Enter Email or Username"/></p>
-    <p><input type="text" name="password" placeholder="Enter Password"/></p>
-    <p><input type="submit" value="Sign in"/></p>
-</form>
-
-
--->
 
 {% endblock %}

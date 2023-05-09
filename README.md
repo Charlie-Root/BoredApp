@@ -8,7 +8,7 @@
 
 <b>My Favourite Features:</b>
 
-- 3rd Party Google login/signup for users.
+- 3rd Party Google login/sign_up for users.
 
 - Use of SQL Indexes in my relational MYSQL database to speed up database queries and make data retrieval more efficient.
 

@@ -28,8 +28,11 @@
 
 
 
-<h1> The BoredApp</h1>
-<h2> Sign up to get amazing activity ideas </h2>
+<a href="{{ url_for('home') }}"><h1>The BoredApp</h1></a>
+<h4> Sign up to get amazing activity ideas </h4>
+<h5> At least one uppercase letter, one lowercase letter, one digit, and one special character(@, !, #, $, %, ^, &)
+</h5>
+
 
 <!-- WTF-Flask FORM -->
 <form action="#" method="POST">
@@ -39,27 +42,9 @@
     <p>{{ form.email(placeholder="Email") }}</p>
     <p>{{ form.username(placeholder="Username") }}</p>
     <p>{{ form.password(placeholder="Password") }}</p>
-    <br/>
     {{ form.submit() }}
 </form>
 <br>
 <p>Have an Account?<a href="{{url_for('login')}}"> Log in</a></p>
-
-<!-- HTML FORM BELOW -->
-
-<!--
-<form action="#" method="POST">
-    <p><input type="text" name="firstname" placeholder="Firstname"/></p>
-    <p><input type="text" name="lastname" placeholder="Lastname"/></p>
-    <p><input type="email" name="email" placeholder="Email"/></p>
-    <p><input type="text" name="username" placeholder="Username"/></p>
-    <p><input type="text" name="password" placeholder="Password"/></p>
-    <p><input type="submit" value="Sign Up"/></p>
-    <p>Have an Account?<a href="{{url_for('login')}}"> Log in</a></p>
-</form>
--->
-
-
-
 
 {% endblock %}
