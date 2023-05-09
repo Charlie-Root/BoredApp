@@ -26,4 +26,5 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
 
 
-
+MYEMAIL=os.environ.get('MYEMAIL')
+MYEMAILPASSWORD=os.environ.get('MYEMAILPASSWORD')

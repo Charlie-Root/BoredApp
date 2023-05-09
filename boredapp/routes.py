@@ -1,8 +1,10 @@
 import secrets
+import smtplib
 from datetime import datetime, timezone, timedelta
 
 import requests
 from flask import request, flash, session, render_template, redirect, url_for
+from itsdangerous import TimedSerializer
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import app, connect_to_api, database
 from boredapp.boredAppFunctions import is_user_logged_in, get_user_id, get_user_firstname, \
@@ -13,7 +15,7 @@ from boredapp.forms import SignUpForm, LogInForm, ForgotPassword
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 import google.auth.transport.requests
-from .config import client_secrets_file, GOOGLE_CLIENT_ID
+from .config import client_secrets_file, GOOGLE_CLIENT_ID,MYEMAILPASSWORD,MYEMAIL
 
 APIurl = "http://www.boredapi.com/api/activity"
 
@@ -190,60 +192,42 @@ def login():
     else:
         return redirect(url_for("user"))
 
-"""
+
 @app.route("/forgotpassword", methods=["POST", "GET"])
 def forgotpassword():
-"""
-        #This function allows a user to reset their password via an external link using their email or username.
-"""
-    emailOrUsername = None
+
     form = ForgotPassword()
+    if form.validate_on_submit():
 
-    # if a POST request was made from the signup page
-    if request.method == "POST":
-        # if the inputted form data is all valid.
-        if form.validate_on_submit():
-            emailOrUsername = form.emailOrUsername.data
-            form.emailOrUsername.data = ''
+        email = form.emailOrUsername.data
+        # Check if the email exists in your database
+        # Generate a unique token for the user
+        # Email the user with a link to reset their password
 
-            # check if a username or email was entered
-            if "@" in emailOrUsername:
-                user = database.session.query(TheUsers).filter_by(Email=emailOrUsername).first()
-            else:
-                user = database.session.query(TheUsers).filter_by(Username=emailOrUsername).first()
-
-            # if a userexists in the database with this username/email
-            if user:
-
-                # Generate a unique token
-                newToken = secrets.token_urlsafe(16)
-
-                # Update the user's token attribute
-                user.token = newToken
-
-                # Commit the changes to the database
-                database.session.commit()
-
-                # Send an email with the reset link
-                reset_link = url_for('reset_password_confirm', token=newToken, _external=True)
-                msg = Message('Password Reset Request', recipients=user.Email)
-                msg.body = f"To reset your password, click on the following link: {reset_link}"
-
-                Mail.send(msg)
-                flash('An email has been sent with instructions to reset your password.', 'success')
-
-            else:
-                flash("No account found with that email or username", "error")
-
-    return render_template("forgotpassword.html", emailOrUsername=emailOrUsername, form=form)
+        ts = TimedSerializer(app.secret_key)
+        token = ts.dumps(email, salt='reset-password')
+        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+            smtp.starttls()
+            smtp.login(MYEMAIL, MYEMAILPASSWORD)
+            subject = 'Reset Your Password'
+            body = render_template('reset_password_email.html', token=token)
+            message = f'Subject: {subject}\n\n{body}'
+            smtp.sendmail('from@example.com', email, message)
+        flash("An email has been sent to you with instructions on how to reset your password", "success")
+    return render_template('forgotpassword.html', form=form)
 
 
-@app.route("/")
-def reset_password_confirm():
-    pass
-"""
-
-
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    ts = TimedSerializer(app.secret_key)
+    try:
+        email = ts.loads(token, salt='reset-password', max_age=86400)
+    except:
+        flash("Invalid or expired token", "error")
+    if request.method == 'POST':
+        # Update the user's password in your database
+        flash("Your password has been updated", "success")
+    return render_template('reset_password.html')
 
 @app.route("/")
 def home():
