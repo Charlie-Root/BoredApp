@@ -100,3 +100,7 @@ def is_user_logged_in():
     else:
         return False
 
+
+def reset_user_password(user_email):
+
+    pass

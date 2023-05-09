@@ -1,7 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, StringField, PasswordField, EmailField
-from wtforms.validators import DataRequired
-from itsdangerous import TimedSerializer
+from wtforms.validators import DataRequired, EqualTo
 
 # Form for sign up
 class SignUpForm(FlaskForm):
@@ -32,8 +31,18 @@ class ForgotPassword(FlaskForm):
     """
         This class creates a submission form for the user forgot password form
     """
-    emailOrUsername = StringField("emailOrUsername:", validators=[DataRequired()])
+    email = EmailField("Email", validators=[DataRequired()])
     submit = SubmitField("Reset Password")
+
+
+class ResetPassword(FlaskForm):
+    password = PasswordField('New Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
+    submit = SubmitField('Submit')
+
+
+
+
 
 """
 app = Flask(__name__)

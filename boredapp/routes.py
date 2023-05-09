@@ -8,10 +8,10 @@ from itsdangerous import TimedSerializer
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import app, connect_to_api, database
 from boredapp.boredAppFunctions import is_user_logged_in, get_user_id, get_user_firstname, \
-    display_the_activity, check_if_activity_is_in_favourites
+    display_the_activity, check_if_activity_is_in_favourites, reset_user_password
 import re
 from boredapp.models import TheUsers, Favourites
-from boredapp.forms import SignUpForm, LogInForm, ForgotPassword
+from boredapp.forms import SignUpForm, LogInForm, ForgotPassword, ResetPassword
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 import google.auth.transport.requests
@@ -195,25 +195,30 @@ def login():
 
 @app.route("/forgotpassword", methods=["POST", "GET"])
 def forgotpassword():
-
     form = ForgotPassword()
     if form.validate_on_submit():
+        user_email = form.email.data
 
-        email = form.emailOrUsername.data
         # Check if the email exists in your database
-        # Generate a unique token for the user
-        # Email the user with a link to reset their password
+        userExists = database.session.query(TheUsers).filter_by(Email=user_email).first()
 
-        ts = TimedSerializer(app.secret_key)
-        token = ts.dumps(email, salt='reset-password')
-        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
-            smtp.starttls()
-            smtp.login(MYEMAIL, MYEMAILPASSWORD)
-            subject = 'Reset Your Password'
-            body = render_template('reset_password_email.html', token=token)
-            message = f'Subject: {subject}\n\n{body}'
-            smtp.sendmail('from@example.com', email, message)
-        flash("An email has been sent to you with instructions on how to reset your password", "success")
+        if userExists:  # if user with this email exists in database
+            # Generate a unique token for the user
+            ts = TimedSerializer(app.secret_key)
+            token = ts.dumps(user_email, salt='reset-password')
+
+            # Generate reset password link
+            reset_password_url = url_for('reset_password', token=token, _external=True)
+
+            with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+                smtp.starttls()
+                smtp.login(MYEMAIL, MYEMAILPASSWORD)
+                subject = 'Reset Your Password'
+                body = f"Click the following link to reset your BoredApp password: {reset_password_url}"
+                message = f'Subject: {subject}\n\n{body}'
+                smtp.sendmail('from@example.com', user_email, message)  # Email the user with a link to reset their password
+
+        flash("A password reset link will be sent to this email if this user exists.", "success")
     return render_template('forgotpassword.html', form=form)
 
 
@@ -224,10 +229,21 @@ def reset_password(token):
         email = ts.loads(token, salt='reset-password', max_age=86400)
     except:
         flash("Invalid or expired token", "error")
-    if request.method == 'POST':
-        # Update the user's password in your database
-        flash("Your password has been updated", "success")
-    return render_template('reset_password.html')
+        return redirect(url_for('forgotpassword'))
+    form = ResetPassword()
+
+    if form.validate_on_submit():
+        # Process the form submission
+        #
+        #reset_user_password(user_email)
+        # if the user is logged in, log them out
+
+        flash("Password Reset", "success")
+        if is_user_logged_in() is True:
+            return redirect(url_for("logout"))
+        return redirect(url_for("login"))
+
+    return render_template('reset_password.html', form=form)
 
 @app.route("/")
 def home():
@@ -316,11 +332,6 @@ def logout():
     if "Username" or "Email" in session:  # if the user has logged in
         flash("Logged out successfully", "success")
 
-    """session.pop("Username", None)  # removing the data from our session dict
-    session.pop("Email", None)  # removing the data from our session dict
-    session.pop("password", None)  # removing the data from our session dict
-    session.pop("UserID", None)  # removing the data from our session dict
-    session.pop("FirstName", None)  # removing the data from our session dict"""
     session.clear()
 
     return redirect(url_for("home"))  # when we log out ,redirect to the home page
