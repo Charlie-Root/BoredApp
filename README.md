@@ -29,7 +29,8 @@
 
 <b>Things to add:</b>
 
-- Dynamic front end design & styling
+- Dynamic front end design & more styling
+- Darkmode/lightmode
 
 
 
