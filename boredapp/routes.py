@@ -1,6 +1,5 @@
 import re
 import smtplib
-
 import google.auth.transport.requests
 from flask import request, flash, session, render_template, redirect, url_for
 import requests
