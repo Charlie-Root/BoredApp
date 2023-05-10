@@ -21,7 +21,7 @@
 - Clean & modular Code, easy to understand & well commented code.
 
 - Use of REST Api and http requests
-- 
+
 - Use of Relational Database -> MySQL
 
 - Unit testing & good test coverage.
