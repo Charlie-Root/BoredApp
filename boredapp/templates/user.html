@@ -31,40 +31,40 @@
 </br>
 
 <form action="{{ url_for('random_activity') }}" method="POST">
-        <input type="submit" name="next" value="Random Activity">
+        <input type="submit" name="next" value="Random Activity" class="generator-buttons">
 </form>
 
 </br>
 
 <form action="{{ url_for('participant_number') }}" method="POST">
-        <input type="text" name="participants" placeholder="No. of participants [1-5]or [8]:"><input type="submit" name="next" value="Activity based on participant number"><br>
+        <input type="text" name="participants" placeholder="No. of participants [1-5]or [8]:"><input type="submit" name="next" value="Activity based on participant number" class="generator-buttons"><br>
 </form>
 
 </br>
 
 
 <form action="{{ url_for('free_activity') }}" method="POST">
-        <input type="submit" name="next" value="Free Activity">
+        <input type="submit" name="next" value="Free Activity" class="generator-buttons">
 </form>
 
 </br>
 
 <form action="{{ url_for('activity_that_costs_money') }}" method="POST">
-        <input type="submit" name="next" value="An activity that may cost money">
+        <input type="submit" name="next" value="An activity that may cost money" class="generator-buttons">
 </form>
 
 </br>
 
 
 <form action="{{ url_for('activity_type') }}" method="POST">
-        <input type="text" name="activity_type" placeholder="Type of activity:"><input type="submit" name="next" value="Activity based on type"><br>
+        <input type="text" name="activity_type" placeholder="Type of activity:"><input type="submit" name="next" value="Activity based on type" class="generator-buttons"><br>
         <h6> Activity types: Education, recreational, social, diy, charity, cooking, relaxation, music, busywork</h6>
 </form>
 
 </br>
 
 <form action="{{ url_for('activity_linked') }}" method="POST">
-        <input type="submit" name="activity_linked" value="Activity With A Link">
+        <input type="submit" name="activity_linked" value="Activity With A Link" class="generator-buttons">
 </form>
 
 </br>

@@ -39,7 +39,7 @@
         <option value="music">Music</option>
         <option value="busywork">Busywork</option>
     </select>
-    <button type="submit">Filter</button>
+    <button type="submit" class="generator-buttons">Filter</button>
 </form>
 
 <ul>
@@ -47,7 +47,7 @@
     <li>
         {{ activity_info[0] }} - no. of participants: {{ activity_info[1] }} - {{ activity_info[2] }} activity
         <form action="{{ url_for('delete_favourite', activity_id=activity_info[3]) }}" method="POST">
-            <button type="submit">Delete</button>
+            <button type="submit" class="generator-buttons">Delete</button>
         </form>
     </li>
 {% endfor %}

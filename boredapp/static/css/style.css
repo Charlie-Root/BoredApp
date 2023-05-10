@@ -1,10 +1,36 @@
 body{
-    background-color: pink;
+    background-color: rgb(186, 216, 247);
+    font-family: 'Concert One', cursive;
 }
 
 li {
     list-style-type: none;
     display: flex;
-    justify-content: space-between;
+    justify-content:space-between;
     align-items: center;
+    padding: 3px;
+
+  }
+
+
+a, a:hover{
+    text-decoration: none;
+    color: inherit;
+}
+
+.generator-buttons {
+    display: inline-block;
+    background-color: #1c79bc;
+    color:whitesmoke;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    border:none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .generator-buttons:hover {
+    background-color: rgb(7, 90, 150);
   }
