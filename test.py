@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
-from boredapp.boredAppFunctions import check_if_activity_is_in_favourites, display_the_activity, is_user_logged_in, \
-    get_user_firstname, get_user_id
+from boredapp.boredAppFunctions import check_if_activity_is_in_favourites, is_user_logged_in, get_user_firstname, \
+    get_user_id, check_if_strong_password
 
 
 # The '@patch' decorator is used in this test case to replace the actual 'database','the_users' and 'datetime' module,
@@ -78,7 +78,6 @@ class TestGetUserFirstname(unittest.TestCase):
 
     @patch('boredapp.boredAppFunctions.database.session.query')
     def test_get_user_firstname_when_user_is_not_logged_in(self, mock_query):
-
         # create a mock session object
         mock_session = {'': ''}
 
@@ -136,7 +135,15 @@ class TestGetUserID(unittest.TestCase):
             self.assertEqual(get_user_id(), "User is not logged in")
 
 
-"""Test display the activity"""
+class TestCheckIfStrongPassword(unittest.TestCase):
+    def test_check_if_strong_password_is_false(self):
+        weakPassword = "Bob"
+        self.assertFalse(check_if_strong_password(weakPassword))
+
+    def test_check_if_strong_password_is_true(self):
+        strongPassword = "Bobiana123!"
+        self.assertTrue(check_if_strong_password(strongPassword))
+
 
 if __name__ == "__main__":
     unittest.main()
