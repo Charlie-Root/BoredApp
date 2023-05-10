@@ -526,7 +526,7 @@ def save_activity():
     if is_user_logged_in() is True:
         activity_id = session['activityID']
         user_id = session['UserID']
-        activity_info = display_the_activity(activity_id)[0]
+        activity_info,link_str = display_the_activity(activity_id)
 
         if check_if_activity_is_in_favourites(activity_id, user_id) is True:
             flash("Activity already exists in favourites", "error")
@@ -548,6 +548,7 @@ def save_activity():
 
             flash("Activity saved to favourites!", "success")
 
-        return render_template('user.html', clicked=True, activityInfo=activity_info)
+        return render_template('user.html', activityInfo=activity_info, clicked=True, link_str=link_str)
+
     else:
         return redirect(url_for("login"))

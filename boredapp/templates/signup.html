@@ -30,8 +30,7 @@
 
 <a href="{{ url_for('home') }}"><h1>The BoredApp</h1></a>
 <h4> Sign up to get amazing activity ideas </h4>
-<h5> At least one uppercase letter, one lowercase letter, one digit, and one special character(@, !, #, $, %, ^, &)
-</h5>
+
 
 
 <!-- WTF-Flask FORM -->
@@ -45,6 +44,10 @@
     {{ form.submit() }}
 </form>
 <br>
+
+<h6> Your password needs at least one uppercase letter, one lowercase letter, one digit, and one special character(@, !, #, $, %, ^, &)
+</h6>
+
 <p>Have an Account?<a href="{{url_for('login')}}"> Log in</a></p>
 
 {% endblock %}
