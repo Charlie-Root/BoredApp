@@ -1,8 +1,6 @@
 import re
-
 from flask import session
 from werkzeug.security import generate_password_hash, check_password_hash
-
 from boredapp import database, connect_to_api
 from boredapp.models import TheUsers, Favourites
 
@@ -105,29 +103,31 @@ def is_user_logged_in():
 
 
 def reset_user_password(user_email, new_password):
-
+    """
+            This function resets the users password in the database to a new password which is hashed.
+    """
     current_user = database.session.query(TheUsers).filter_by(Email=user_email).first()
     hashed_password = generate_password_hash(new_password)
 
-    if check_password_hash(current_user.Password, new_password):  #  we must use this specific function to check if they are the same (instead of comparing the users current password to the new 'hashed_password') because the hashing algorithm adds a random salt value, so the hash values will be different even for the same password.
+    if check_password_hash(current_user.Password,
+                           new_password):  # we must use this specific function to check if they are the same (instead of comparing the users current password to the new 'hashed_password') because the hashing algorithm adds a random salt value, so the hash values will be different even for the same password.
         return False
 
     current_user.Password = hashed_password
     database.session.commit()
     return True
 
-def check_if_strong_password(password):
-    # At least one uppercase letter, one lowercase letter, one digit, and one special character
 
+def check_if_strong_password(password):
+    """
+            This function compares password against regex requirements to determine if it's strong.
+    """
+    # At least one uppercase letter, one lowercase letter, one digit, and one special character
     regex_requirements = re.compile(
         r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@!#$%^&*_\-])(?!.*[~`\[\]{}()+=\\|;:'\",<.>?/]).{8,}$")
 
-    is_password_strong = regex_requirements.fullmatch(password)        # returns ['0' if True or None is False]
+    is_password_strong = regex_requirements.fullmatch(password)  # returns ['0' if True or None is False]
 
     if is_password_strong:
         return True
     return False
-
-
-
-

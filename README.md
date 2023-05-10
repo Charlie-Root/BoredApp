@@ -8,17 +8,26 @@
 
 <b>My Favourite Features:</b>
 
-- 3rd Party Google login/sign_up for users.
+- 3rd Party Google log in and sign up for users.
+
+- Forgot password feature to generate a link and send it to user email to reset password.
 
 - Use of SQL Indexes in my relational MYSQL database to speed up database queries and make data retrieval more efficient.
 
+- Use of the SQLAlchemy ORM instead of using raw SQL queries -> to prevent sql injection attacks.
+
+- Password Hashing and salting for data security.
+
 - Clean & modular Code, easy to understand & well commented code.
 
-- Unit testing for good test coverage.
+- Use of REST Api and http requests
+- 
+- Use of Relational Database -> MySQL
+
+- Unit testing & good test coverage.
+
 
 <b>Things to add:</b>
-
-- 'forgot password' feature
 
 - Dynamic front end design & styling
 

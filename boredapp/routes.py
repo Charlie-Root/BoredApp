@@ -199,6 +199,9 @@ def login():
 
 @app.route("/forgot_password", methods=["POST", "GET"])
 def forgot_password():
+    """
+            This function sends a reset password link to a users email.
+    """
     form = ForgotPassword()
     if form.validate_on_submit():
         user_email = form.email.data
@@ -229,6 +232,9 @@ def forgot_password():
 
 @app.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
+    """
+            This function resets a users password.
+    """
     ts = TimedSerializer(app.secret_key)
     try:
         email = ts.loads(token, salt='reset-password', max_age=86400)
@@ -303,6 +309,9 @@ def view_favourites_by_activity_type():
 
 @app.route('/favourites/delete/<string:activity_id>', methods=['POST'])
 def delete_favourite(activity_id):
+    """
+            This function deleted an activity from the favourites.
+    """
     if is_user_logged_in() is True:
         activity_to_delete = database.session.query(Favourites).filter_by(UserID=session['UserID'],
                                                                           activityID=activity_id).first()
