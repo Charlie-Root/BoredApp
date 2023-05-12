@@ -42,11 +42,16 @@
     <button type="submit" class="generator-buttons">Filter</button>
 </form>
 
+
+
 <ul>
-{% for activity_info in users_favourites %}
+{% for name, participants, activity_type, link , activity_id in users_favourites %}
     <li>
-        {{ activity_info[0] }} - no. of participants: {{ activity_info[1] }} - {{ activity_info[2] }} activity
-        <form action="{{ url_for('delete_favourite', activity_id=activity_info[3]) }}" method="POST">
+        {{ name }} - no. of participants: {{ participants }} - {{ activity_type }} activity
+        {% if link %}
+            - {{ link }}
+        {% endif %}
+        <form action="{{ url_for('delete_favourite', activity_id=activity_id) }}" method="POST">
             <button type="submit" class="generator-buttons">Delete</button>
         </form>
     </li>
@@ -54,4 +59,23 @@
 </ul>
 {% endblock %}
 
+
+<!-- hyperlinked link -->
+<!--
+<ul>
+{% for name, participants, activity_type, link , activity_id in users_favourites %}
+    <li>
+        {{ name }} - no. of participants: {{ participants }} - {{ activity_type }} activity
+        {% if link %}
+            - <a href="{{ link }}">{{ link }}</a>
+        {% endif %}
+        <form action="{{ url_for('delete_favourite', activity_id=activity_id) }}" method="POST">
+            <button type="submit" class="generator-buttons">Delete</button>
+        </form>
+    </li>
+{% endfor %}
+</ul>
+
+
+-->
 

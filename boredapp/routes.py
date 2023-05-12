@@ -63,10 +63,11 @@ def callback():
         id_token=credentials._id_token,
         request=token_request,
         audience=GOOGLE_CLIENT_ID,
-        clock_skew_in_seconds=300
+        clock_skew_in_seconds=300  # This provides a grace period for slight clock differences between the Google
+        # server's clock and the client's clock during token verification. The time difference between the two clocks
+        # can be up to 5 minutes for the token to be valid.
 
     )
-
 
     # save the user's profile information to the session
     session["FirstName"] = id_info.get("given_name")
@@ -274,7 +275,7 @@ def view_all_favourites():
     if is_user_logged_in() is True:
         all_users_favourites = (
             database.session.query(Favourites.activity, Favourites.participants, Favourites.type,
-                                   Favourites.activityID)
+                                   Favourites.link,Favourites.activityID, )
             .filter(Favourites.UserID == session["UserID"])
             .all())
         return render_template("favourites.html", users_favourites=all_users_favourites)
@@ -296,7 +297,7 @@ def view_favourites_by_activity_type():
         else:
 
             favourites_by_activity_type = database.session.query(Favourites.activity, Favourites.participants,
-                                                                 Favourites.type,
+                                                                 Favourites.type,Favourites.link,
                                                                  Favourites.activityID).filter_by(
                 UserID=session['UserID'], type=activity_type).all()
 
@@ -526,7 +527,7 @@ def save_activity():
     if is_user_logged_in() is True:
         activity_id = session['activityID']
         user_id = session['UserID']
-        activity_info,link_str = display_the_activity(activity_id)
+        activity_info, link_str = display_the_activity(activity_id)
 
         if check_if_activity_is_in_favourites(activity_id, user_id) is True:
             flash("Activity already exists in favourites", "error")
@@ -542,7 +543,7 @@ def save_activity():
             # Run query to save activity info
             add_activity = Favourites(activityID=activity_id, UserID=user_id, activity=activity_name,
                                       participants=participant_number,
-                                      type=activity_type)
+                                      type=activity_type, link=link_str)
             database.session.add(add_activity)
             database.session.commit()
 
