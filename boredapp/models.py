@@ -52,7 +52,7 @@ class TheUsers(Base):
     Username = database.Column(database.String(200), index=True)  # create index for Username column
     Password = database.Column(database.String(200))
 
-    def __init__(self, FirstName, LastName, Email, Username=None, Password=None): # Set Username & Password to Default None becuase if a user signs up with google account then those arguments aren't needed 
+    def __init__(self, FirstName, LastName, Email, Username=None, Password=None): # Set Username & Password to Default None becuase if a user signs up with google account then those arguments aren't needed
         self.FirstName = FirstName
         self.LastName = LastName
         self.Email = Email
