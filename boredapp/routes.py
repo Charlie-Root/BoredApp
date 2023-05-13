@@ -201,10 +201,11 @@ def forgot_password():
     """
     form = ForgotPassword()
     if form.validate_on_submit():
-        user_email = form.email.data
+        user_email = form.email.data.lower()
 
         # Check if the email exists in your database
-        user_exists = database.session.query(TheUsers).filter_by(Email=user_email).first()
+        user_exists = database.session.query(TheUsers).filter(TheUsers.Email == user_email,
+                                                              TheUsers.Password != None).first()
 
         if user_exists:  # if user with this email exists in database
             # Generate a unique token for the user
