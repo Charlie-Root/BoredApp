@@ -27,6 +27,7 @@ CREATE TABLE favourites (
     activity VARCHAR(200) NOT NULL,
     participants INT NOT NULL,
     type VARCHAR(200) NOT NULL,
+    link VARCHAR(200),
     CONSTRAINT pk_favourites PRIMARY KEY (activityID),
     CONSTRAINT fk_favourites_the_users FOREIGN KEY (UserID) REFERENCES the_users(UserID),
     INDEX ix_favourites_activityID_UserID (activityID, UserID)
