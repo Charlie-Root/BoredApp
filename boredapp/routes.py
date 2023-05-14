@@ -254,7 +254,7 @@ def reset_password(token):
             return redirect(url_for("login"))
         else:
             flash("New password cannot be the same as the current password", "error")
-    else:
+    elif form.validate_on_submit() and check_if_strong_password(form.password.data) is False:
         flash("A stronger password is needed", "error")
 
     return render_template('resetpassword.html', form=form)
