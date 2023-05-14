@@ -70,9 +70,9 @@ def callback():
     )
 
     # save the user's profile information to the session
-    session["FirstName"] = id_info.get("given_name")
-    session["LastName"] = id_info.get("family_name")
-    session["Email"] = id_info.get("email")
+    session["FirstName"] = id_info.get("given_name").capitalize()
+    session["LastName"] = id_info.get("family_name").capitalize()
+    session["Email"] = id_info.get("email").lower()
 
     # save the user's profile information to the database
     user_exists = database.session.query(TheUsers).filter(TheUsers.Email == session["Email"]).first()
@@ -110,13 +110,13 @@ def sign_up():
 
             # if the inputted form data is all valid.
             if form.validate_on_submit() and check_if_strong_password(form.password.data) is True:
-                firstname = form.firstname.data
+                firstname = form.firstname.data.capitalize()
                 form.firstname.data = ''
-                lastname = form.lastname.data
+                lastname = form.lastname.data.capitalize()
                 form.lastname.data = ''
-                email = form.email.data
+                email = form.email.data.lower()
                 form.email.data = ''
-                username = form.username.data
+                username = form.username.data.lower()
                 form.username.data = ''
                 password = form.password.data
                 form.password.data = ''
@@ -160,7 +160,7 @@ def login():
         if request.method == "POST":
             # if the inputted form data is all valid.
             if form.validate_on_submit():
-                email_or_username = form.email_or_username.data
+                email_or_username = form.email_or_username.data.lower()
                 form.email_or_username.data = ''
                 password = form.password.data
                 form.password.data = ''

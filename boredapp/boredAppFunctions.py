@@ -89,7 +89,7 @@ def get_user_firstname():
 
     firstname = current_user.FirstName  # select their FirstName column
 
-    return firstname.capitalize()
+    return firstname
 
 
 def is_user_logged_in():
