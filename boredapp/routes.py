@@ -172,21 +172,26 @@ def login():
                 if "@" in email_or_username:
                     session['Email'] = email_or_username  # saves the users email into the session
                     user = database.session.query(TheUsers).filter_by(Email=email_or_username).first()
+                    googleAccountUser=database.session.query(TheUsers).filter_by(Email=email_or_username, Password=None).first()
+
                 else:
                     session['Username'] = email_or_username  # saves the users email into the session
                     user = database.session.query(TheUsers).filter_by(Username=email_or_username).first()
 
-                # if a user exists in the database with this username/email
-                if user:
-                    # compare the hashed password from the database to the password the user logged in
-                    if check_password_hash(user.Password, password):
-                        session['UserID'] = get_user_id()  # save the users ID to a session for later use
-                        session['FirstName'] = get_user_firstname()
+                if googleAccountUser:
+                    flash("A Google account already exists with this email. Please login with Google.", "error")
+                elif user and check_password_hash(user.Password, password):                    # compare the hashed password from the database to the password the user logged in
+                    session['UserID'] = get_user_id()  # save the users ID to a session for later use
+                    session['FirstName'] = get_user_firstname()
 
-                        flash("Log in Successful!", "success")
-                        return redirect(url_for("user"))
+                    flash("Log in Successful!", "success")
+                    return redirect(url_for("user"))
+                else:
+                    flash("Log in Unsuccessful, Please try again!", "error")
 
-                flash("Log in Unsuccessful, Please try again!", "error")
+                session.pop('Email', None)
+                session.pop('Username', None)
+
 
         return render_template("login.html", email_or_username=email_or_username, password=password, form=form)
 

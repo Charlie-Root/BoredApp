@@ -31,6 +31,8 @@
 
 - Dynamic front end design & more styling
 - Darkmode/lightmode
+- Token expiry once pw changed
+- Bug fix: you can log into someones account directly with google login if a email in the db matches the google login email
 
 
 
