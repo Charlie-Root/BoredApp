@@ -234,10 +234,11 @@ def reset_password(token):
             This function resets a users password.
     """
     ts = TimedSerializer(app.secret_key)
+
     try:
-        email = ts.loads(token, salt='reset-password', max_age=86400)
+        email = ts.loads(token, salt='reset-password', max_age=900) # token is valid for 15 mins max
     except:
-        flash("Invalid or expired token", "error")
+        flash("Expired token. Go back to forgot password to generate a new link.", "error")
         return redirect(url_for('forgot_password'))
     form = ResetPassword()
 
