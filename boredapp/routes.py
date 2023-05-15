@@ -510,9 +510,7 @@ def activity_linked():
     if is_user_logged_in() is True:
         if request.method == 'POST':
 
-            activity_with_link_found = False
-
-            while not activity_with_link_found:
+            while True:
                 url = "{}/".format(APIurl)
                 activity = connect_to_api(url)
 
