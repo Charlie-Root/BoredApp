@@ -10,7 +10,7 @@
 
 - 3rd Party Google log in and sign up for users.
 
-- Forgot password feature to generate a link and send it to user email to reset password.
+- Forgot password feature to generate a link sent to a user's email to reset password.
 
 - Use of SQL Indexes in my relational MYSQL database to speed up database queries and make data retrieval more efficient.
 
