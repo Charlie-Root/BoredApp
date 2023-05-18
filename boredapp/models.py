@@ -24,7 +24,7 @@ def create_database():
     cursor = cnx.cursor()
 
     # Execute the SQL command to create the new database
-    cursor.execute("CREATE DATABASE {}".format(DATABASENAME))
+    cursor.execute(f"CREATE DATABASE {DATABASENAME}")
 
     # Commit the transaction to make the database creation permanent
     cnx.commit()

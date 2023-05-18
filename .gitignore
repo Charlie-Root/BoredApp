@@ -2,3 +2,7 @@
 notes
 venv/*
 client_secret.json
+*.pyc
+__pycache__
+Lib/
+Scripts/

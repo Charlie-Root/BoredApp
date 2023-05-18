@@ -20,7 +20,7 @@ def display_the_activity(activityID):
     if activityID is None:
         return "No activity has been selected"
 
-    url = "{}?key={}".format(api_url, activityID)
+    url = f"{api_url}?key={activityID}"
     activity = connect_to_api(url)
 
     session[
@@ -35,20 +35,21 @@ def display_the_activity(activityID):
     # this also makes the link hyperlinked
     link_str = f"{activity_link}" if activity_link else ""
 
-    return "{}, it's a {} activity and can be done by {} participant{}".format(
-        activity_name, activity_type, participant_number, "" if participant_number == 1 else "s"), link_str
+    return (
+        f"""{activity_name}, it's a {activity_type} activity and can be done by {participant_number} participant{"" if participant_number == 1 else "s"}""",
+        link_str,
+    )
 
 
 def check_if_activity_is_in_favourites(activityID, UserID):
     """
         This function checks the database to see if the activity that the user wants to save is already saved in the database or not.
     """
-    favourites_exists = database.session.query(Favourites).filter_by(activityID=activityID, UserID=UserID).first()
-
-    if favourites_exists:  # if True
-        return True
-    else:  # if False
-        return False
+    return bool(
+        favourites_exists := database.session.query(Favourites)
+        .filter_by(activityID=activityID, UserID=UserID)
+        .first()
+    )
 
 
 # this must be called after a user has logged in, so we can save the user's UserID into the session for later use.
@@ -58,18 +59,24 @@ def get_user_id():
     """
     if 'Email' in session:
         # query the user by their email
-        current_user = database.session.query(TheUsers).filter_by(Email="{}".format(session['Email'])).first()
+        current_user = (
+            database.session.query(TheUsers)
+            .filter_by(Email=f"{session['Email']}")
+            .first()
+        )
 
     elif 'Username' in session:
         # query the user by their username
-        current_user = database.session.query(TheUsers).filter_by(Username="{}".format(session['Username'])).first()
+        current_user = (
+            database.session.query(TheUsers)
+            .filter_by(Username=f"{session['Username']}")
+            .first()
+        )
 
     else:
         return "User is not logged in"
 
-    user_id = current_user.UserID  # select their UserID column
-
-    return user_id
+    return current_user.UserID
 
 
 def get_user_firstname():
@@ -78,28 +85,31 @@ def get_user_firstname():
     """
     if 'Email' in session:
         # query the user by their email
-        current_user = database.session.query(TheUsers).filter_by(Email="{}".format(session['Email'])).first()
+        current_user = (
+            database.session.query(TheUsers)
+            .filter_by(Email=f"{session['Email']}")
+            .first()
+        )
 
     elif 'Username' in session:
         # query the user by their username
-        current_user = database.session.query(TheUsers).filter_by(Username="{}".format(session['Username'])).first()
+        current_user = (
+            database.session.query(TheUsers)
+            .filter_by(Username=f"{session['Username']}")
+            .first()
+        )
 
     else:
         return "User is not logged in"
 
-    firstname = current_user.FirstName  # select their FirstName column
-
-    return firstname
+    return current_user.FirstName
 
 
 def is_user_logged_in():
     """
         This function checks if there is a UserID saved in the current session to verify if a user is currently logged in or not.
     """
-    if "UserID" in session:  # if the user has logged in
-        return True
-    else:
-        return False
+    return "UserID" in session
 
 
 def reset_user_password(user_email, new_password):
@@ -126,8 +136,4 @@ def check_if_strong_password(password):
     regex_requirements = re.compile(
         r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@!#$%^&*_\-])(?!.*[~`\[\]{}()+=\\|;:'\",<.>?/]).{8,}$")
 
-    is_password_strong = regex_requirements.fullmatch(password)  # returns ['0' if True or None is False]
-
-    if is_password_strong:
-        return True
-    return False
+    return bool(is_password_strong := regex_requirements.fullmatch(password))
