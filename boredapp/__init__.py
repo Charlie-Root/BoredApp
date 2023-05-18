@@ -47,3 +47,5 @@ def connect_to_api(url):
     response = requests.get(url)
     dataResponse = response.text
     return json.loads(dataResponse)
+
+from boredapp import routes
